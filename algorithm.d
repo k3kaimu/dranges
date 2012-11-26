@@ -44,6 +44,12 @@ import dranges.functional,
        dranges.traits,
        dranges.typetuple;
 
+version(unittest)
+{
+    pragma(lib, "dranges");
+    void main(){}
+}
+
 /**
 Small one-liners to use reduce. Sum and product work on empty ranges (they return 0 and 1, respectively),
 but not minOf and maxOf.
@@ -536,19 +542,21 @@ unittest
     assert(tmap!"a"(r1, s, e).empty); // e is empty -> tmap also
 
     auto tf = tfilter!"a%2"(r1, s); // keeps the odd elements from r1, produces 2-tuples (1,'a'),(3,'c'),(5,'e')
-    string foo(int a, dchar b) { return to!(string)(array(std.range.repeat(b,a)));}
-    auto tm4 = tmap!foo(tf); // maps a standard binary function on a 2-tuple range
+    auto tm4 = tmap!"to!(string)(array(std.range.repeat(b,a)))"(tf); // maps a standard binary function on a 2-tuple range
     assert(equal(tm4, ["a","ccc","eeeee"][]));
 
     auto r2 = [1,2,3][];
     // combinations(r2,r2) is equivalent to [(1,1),(1,2),(1,3),(2,1),(2,2),(2,3),(3,1),(3,2),(3,3)][]
     auto combs = tmap!"a*b"(combinations(r2,r2));
     assert(equal(combs, [1,2,3,2,4,6,3,6,9][]));
-    /*
+    
+  version(none)
+  {
     auto r3 = [1, 2, 3];
     //first element of [0] expresses r3 is used as range, but second element expresses "abcd" is not used as range.
     auto ss = tmap!("b[a]", [0])(r3, "abcd");
-    assert(equal(ss, ['b', 'c', 'd'][]));*/
+    assert(equal(ss, ['b', 'c', 'd'][]));
+  }
 }
 
 
@@ -965,7 +973,7 @@ unittest
     auto r2 = [ 3.0, 4.0, 5.0, 6.0];
     string[] r3 = ["a", "b", "cc"];
     // standard function test
-    bool pred(int a, double b, string c) { return (a<b) && (c.length>1);}
+    bool pred(int a, real b, string c){return (a < b) && (c.length > 1);}
     auto tf1 = tfilter!pred(r1,r2,r3);
     assert(equal(tf1, [tuple(2, 5.0, "cc")][]));       // tf1 is just (2, 5.0, "cc)
 
@@ -2079,7 +2087,7 @@ unittest
     bool pythagorean(int a, int b, int c) { return a*a+b*b == 2*c*c && a<b;}
     auto input = numbers(1,11);
 
-    auto lc = comp!(foo, "a*a+b*b == c*c && a<b")(input, input, input);
+    auto lc = comp!("tuple(a, b, c)", "a*a+b*b == c*c && a<b")(input, input, input);
     assert(equal(lc, [tuple(3,4,5), tuple(6,8,10)][]));
 }
 
