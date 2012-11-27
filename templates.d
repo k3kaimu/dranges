@@ -941,3 +941,32 @@ unittest
     assert(switchd == "It's a double");
     assert(switchs == "It's something else");
 }
+
+
+/**
+Inline Template
+
+Example:
+---
+alias InlineTemplate!("size_t N", q{alias TypeNuple!(int, N) IT;}) Generator0;
+---
+*/
+template InlineTemplate(string args, string code)
+{
+    mixin("template IT(" ~ args ~ "){" ~ code ~ "}");
+    alias IT InlineTemplate;
+}
+
+
+///ditto
+template InlineTemplate(string args, string code, string file, size_t line)
+{
+    mixin("template IT(" ~ args ~ "){" ~ code ~ "}");
+    alias IT InlineTemplate;
+}
+
+unittest
+{
+    alias InlineTemplate!("T", q{T value;}, __FILE__, __LINE__) S;
+    alias InlineTemplate!("T", q{struct IT{T value;}}, __FILE__, __LINE__) Struct;
+}

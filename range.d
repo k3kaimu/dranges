@@ -131,17 +131,72 @@ unittest
     assert(dropLast(r1,100).empty);
 }
 
-//for dropWhile, takeWhile, ...etc
-private mixin template arityTPNmixin(string templateFun, string ParameterGenerator)
+
+/**
+This template return arity of a function.
+
+Example:
+---
+template Generator0(size_t N)
+{
+    alias TypeNuple!(int, N) Generator0;
+}
+
+alias templateFunctionAnalysis!(( (a, b, c) => a), Generator0) Result0;
+
+static assert(Result0.arity == 3);
+static assert(Result0.endN == 3);
+static assert(is(Result0.ArgumentTypes == Generator0!3));
+static assert(is(Result0.ReturnType == int));
+
+
+template Generator1(size_t N)
+{
+    alias TypeTuple!(int, ushort, long, double*, uint, real[])[N] Generator1;
+}
+
+static assert(Result1.arity == 1);
+static assert(Result1.endN == 3);
+static assert(is(Result1.ArgumentTypes == double*));
+static assert(is(Result1.ReturnType == double*));
+---
+*/
+template templateFunctionAnalysis(alias templateFun, alias ParameterGenerator, size_t startN = 0, size_t limittedN = 10)
 {
     template arityTPN(size_t N){
-        static if(is(typeof( mixin(templateFun ~ "(" ~ ParameterGenerator ~"!N.init)") )))
+        static if(is(typeof(templateFun(ParameterGenerator!N.init))))
             enum arityTPN = N;
-        else static if(N < 30)
+        else static if(N < limittedN)
             enum arityTPN = arityTPN!(N+1);
         else
-            static assert(0, "arity Error : " ~ mixin(templateFun ~ ".stringof"));
+            static assert(0, "arity Error : " ~ templateFun.stringof);
     }
+
+    enum endN = arityTPN!(startN);
+    alias ParameterGenerator!(endN) ArgumentTypes;
+    enum arity = TypeTuple!(ArgumentTypes).length;
+    alias typeof(templateFun(ArgumentTypes.init)) ReturnType;
+}
+
+unittest 
+{
+    alias InlineTemplate!("size_t N", q{alias TypeNuple!(int, N) IT;}) Generator0;
+    alias templateFunctionAnalysis!(( (a, b, c) => a), Generator0) Result0;
+
+    static assert(Result0.arity == 3);
+    static assert(Result0.endN == 3);
+    static assert(is(Result0.ArgumentTypes == Generator0!3));
+    static assert(is(Result0.ReturnType == int));
+
+
+
+    alias InlineTemplate!("size_t N", q{alias TypeTuple!(int, ushort, long, double*, uint, real[])[N] IT;}) Generator1;
+    alias templateFunctionAnalysis!(((double* a) => a), Generator1) Result1;
+
+    static assert(Result1.arity == 1);
+    static assert(Result1.endN == 3);
+    static assert(is(Result1.ArgumentTypes == double*));
+    static assert(is(Result1.ReturnType == double*));
 }
 
 /**
@@ -214,16 +269,14 @@ template dropWhile(alias pred, size_t step = 1){
         template ParamGenForArity(size_t N){
                 alias TypeTuple!(TypeNuple!(ElementType!R, N), T) ParamGenForArity;
         }
-        
-        mixin arityTPNmixin!("predicate", "ParamGenForArity");
-        
-        R dropWhile(R r, T subParam)
+
+        enum N = templateFunctionAnalysis!(predicate, ParamGenForArity).endN;
+
+        R dropWhile(R r, auto ref T subParam)
         {
-            alias arityTPN!0 N;
-            
             static if(N == 0){
                 R result = r.save;
-                while(!result.empty && predicate()) result.popFrontN(step);
+                while(!result.empty && predicate(subParam)) result.popFrontN(step);
                 return result;
             }else static if(N == 1){
                 R result = r.save;
@@ -347,13 +400,11 @@ template popFrontWhile(alias pred, size_t step = 1){
     
     template popFrontWhile(R, T...){
         
-        template ParamCreateN(size_t N){
-            alias TypeTuple!(TypeNuple!(ElementType!R, N), T) ParamCreateN;
+        template ParamGenForArity(size_t N){
+            alias TypeTuple!(TypeNuple!(ElementType!R, N), T) ParamGenForArity;
         }
-    
-        mixin arityTPNmixin!("predicate", "ParamCreateN");
         
-        enum N = arityTPN!(0);
+        enum N = templateFunctionAnalysis!(predicate, ParamGenForArity).endN;
         alias ElementType!R ET;
         
         size_t popFrontWhile(ref R r, T subArgs){
@@ -464,12 +515,10 @@ template takeWhile(alias pred){
             alias TypeTuple!(TypeNuple!(ElementType!R, N), T) ParamGenForArity;
         }
         
-        mixin arityTPNmixin!("predicate", "ParamGenForArity");
-        
         struct TakeWhile{
             Tuple!T _subArgs;
             
-            enum N = arityTPN!0;
+            enum N = templateFunctionAnalysis!(predicate, ParamGenForArity).endN;
             
             static if(N)
                 SegmentType!(N, R) _sr;
@@ -541,9 +590,9 @@ template multiTakeWhile(pred...)if(pred.length){
         template segmentAritys(size_t predIdx){
             static if(predIdx < pred.length){
                 alias predicates[predIdx] pred;
-                mixin arityTPNmixin!("pred", "ParamGenForArity");
                 
-                alias TypeTuple!(arityTPN!0, segmentAritys!(predIdx+1)) segmentAritys;
+                
+                alias TypeTuple!(templateFunctionAnalysis!(pred, ParamGenForArity).endN, segmentAritys!(predIdx+1)) segmentAritys;
             }else
                 alias TypeTuple!() segmentArity;
         }
@@ -1207,6 +1256,7 @@ if(Ranges.length && allSatisfy!(isInputRange, staticMap!(Unqual, Ranges)))
 
 //    mixin Chainable!();
 }
+
 
 Knit!(R) knit(R...)(R ranges) if (allSatisfy!(isInputRange, R))
 {
