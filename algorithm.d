@@ -227,7 +227,7 @@ auto ss = tmap!("b[a]", [0])(r3, "abcd");
 assert(equal(ss, ['b', 'c', 'd'][]));
 ----
 */
-/+
+
 template tmap(fun...)if(fun.length >= 1){
     
     ///if RangeIndexTF!(T)[i] is true, T[i] is RangeType
@@ -245,8 +245,19 @@ template tmap(fun...)if(fun.length >= 1){
     
     auto tmap(T...)(T args)if(T.length > 1 || (T.length == 1 && !__traits(compiles, ElementType!(T[0]).Types)))
     {
-        return TMap!(staticMap!(Unqual, T))(args);
+        static if(is(typeof(TMap!(staticMap!(Unqual, T))(args))))
+            return TMap!(staticMap!(Unqual, T))(args);
+        else{
+            map!nf(knit(ranges));
+        }
     }
+
+
+    auto nf(T...)(Tuple!T e)
+    {
+        return _fun(e.field);
+    }
+
     
     auto tmap(T)(T args)if(__traits(compiles, ElementType!T.Types))
     {
@@ -496,14 +507,14 @@ template tmap(fun...)if(fun.length >= 1){
         alias typeof(T.init.length) _lengthType;
     }
 }
-+/
+
 template TMapType(alias fun, R...)
 if(__traits(compiles, tmap!fun(R.init)))
 {
     alias typeof(tmap!fun(R.init)) TMapType;
 }
 
-
+/*
 template tmap(alias fun, R...)
 {
     auto tmap(R ranges)
@@ -520,7 +531,7 @@ template tmap(alias fun, R...)
     {
         return _fun(e.field);
     }
-}
+}*/
 
 
 unittest
@@ -550,13 +561,14 @@ unittest
     auto combs = tmap!"a*b"(combinations(r2,r2));
     assert(equal(combs, [1,2,3,2,4,6,3,6,9][]));
     
-  version(none)
-  {
     auto r3 = [1, 2, 3];
     //first element of [0] expresses r3 is used as range, but second element expresses "abcd" is not used as range.
     auto ss = tmap!("b[a]", [0])(r3, "abcd");
     assert(equal(ss, ['b', 'c', 'd'][]));
-  }
+
+    ///multi function and range-choose test
+    auto tm5 = tmap!("b[a]", "b[a]", [0])(r3, "abcd");
+    assert(equal(tm5, [tuple('b', 'b'), tuple('c', 'c'), tuple('d', 'd')][]));
 }
 
 
