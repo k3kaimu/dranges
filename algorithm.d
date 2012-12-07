@@ -168,6 +168,7 @@ template NMapType(alias fun, R)
 
 unittest
 {
+    
     scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
     
     auto r1 = [0,1,2,3,4,5,6];
@@ -183,8 +184,8 @@ unittest
     int[] e;
     auto nm4 = nmap!"a%2 == 0 ? a*b*c : a+b+c"(e); // e is empty -> cannot map a ternary function on it
     assert(nm4.empty);
-
 }
+
 
 /**
 Maps a n-args function on either n ranges in parallel or on an n-tuple producing range.
@@ -248,14 +249,10 @@ template tmap(fun...)if(fun.length >= 1){
         static if(is(typeof(TMap!(staticMap!(Unqual, T))(args))))
             return TMap!(staticMap!(Unqual, T))(args);
         else{
-            map!nf(knit(ranges));
+            static assert(fun.length == 1);
+            alias InlineTemplate!("alias f", `auto IT(T...)(Tuple!T e){return naryFun!(f)(e.field);}`) nf;
+            return map!(nf!(fun[0]))(knit(args));
         }
-    }
-
-
-    auto nf(T...)(Tuple!T e)
-    {
-        return _fun(e.field);
     }
 
     
@@ -264,6 +261,7 @@ template tmap(fun...)if(fun.length >= 1){
         return map!(Prepare!(fun, ElementType!T.Types))(args);
     }
     
+
     struct TMap(T...)
     {
         Tuple!(T) _input;
