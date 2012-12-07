@@ -970,3 +970,4 @@ unittest
     alias InlineTemplate!("T", q{T value;}, __FILE__, __LINE__) S;
     alias InlineTemplate!("T", q{struct IT{T value;}}, __FILE__, __LINE__) Struct;
 }
+

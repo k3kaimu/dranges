@@ -113,3 +113,105 @@ unittest{
     foreach(i; 0..3)
         assert(npi3.array[i] == i);
 }
+
+
+
+/**
+add traits to Type T.
+
+Example:
+---
+int[] r = [0, 1, 2, 3, 4];
+auto nr = r.addTraits!q{@property size_t rank(){return 1;}};
+auto v = nr.value;
+
+static assert(is(typeof(nr.rank)));
+static assert(!is(typeof(v.rank)));
+---
+*/
+template addTraits(string decl, T)
+{
+    AddTraits addTraits(T value)
+    {
+        return AddTraits(value);
+    }
+
+    struct AddTraits
+    {
+        enum addCode = decl;
+
+        T value;
+        alias value this;
+
+        this(T v){value = v;}
+
+        mixin(decl);
+    }
+}
+
+unittest{
+    int[] r = [0, 1, 2, 3, 4];
+    auto nr = r.addTraits!q{@property size_t rank(){return 1;}};
+    auto v = nr.value;
+
+    static assert(is(typeof(nr.rank)));
+    static assert(!is(typeof(v.rank)));
+}
+
+
+/**
+add @disable declaration to T.
+
+Example:
+---
+int[] r = [0, 1, 2, 3, 4];
+auto nr = r.disable!q{int front()};
+auto enr = nr.value;
+
+static assert(!isInputRange!(typeof(nr)));
+static assert(isInputRange!(typeof(enr)));
+---
+*/
+auto disable(string code, T)(T value)
+{
+    return addTraits!("@disable " ~ code ~ ";", T)(value);
+}
+
+
+/**
+clear all traits which added by using addTraits.
+
+Example:
+---
+import std.range : isInputRange;
+
+int[] r = [0, 1, 2, 3, 4];
+auto nr = r.disable!q{int front()};
+auto enr = nr.value;
+
+auto eall = nr.disable!q{void popFront()}.disable!q{bool empty()}.clearAllAddition;
+static assert(isInputRange!(typeof(eall)));
+---
+*/
+auto clearAllAddition(T)(T value)
+{
+  static if(is(typeof(T.addCode)) && is(T == typeof(addTraits!(T.addCode, typeof(T.value))(typeof(T.value).init))))
+    return clearAllAddition(value.value);
+  else
+    return value;
+}
+
+
+unittest{
+    import std.range : isInputRange;
+
+    int[] r = [0, 1, 2, 3, 4];
+    auto nr = r.disable!q{int front()};
+    auto enr = nr.value;
+
+    static assert(!isInputRange!(typeof(nr)));
+    static assert(isInputRange!(typeof(enr)));
+
+    auto eall = nr.disable!q{void popFront()}.disable!q{bool empty()}.clearAllAddition;
+    static assert(isInputRange!(typeof(eall)));
+}
