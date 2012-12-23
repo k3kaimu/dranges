@@ -47,11 +47,6 @@ import dranges.algorithm,
        dranges.typetuple,
        dranges.nonametype;
 
-version(unittest){
-    pragma(lib, "dranges");
-    void main(){}
-}
-
 /**
 Return:
 the smallest length of all non-infinite ranges passed as inputs. All finite ranges must have a length member.
@@ -77,8 +72,8 @@ size_t minLength(R...)(R ranges) if (allSatisfy!(isForwardRange, R) && allHaveLe
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto s = ["a","b","c","d","e","f"];
     int[] r = [0,1,2,3];
@@ -120,8 +115,8 @@ R dropLast(R)(R range, size_t n) if (isBidirectionalRange!R)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5];
     auto d = dropLast(r1,3);
@@ -297,8 +292,8 @@ template dropWhile(alias pred, size_t step = 1){
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
 // Unary predicate tests:
     string s = "  , abcd  efg";
@@ -437,8 +432,8 @@ template popFrontWhile(alias pred, size_t step = 1){
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("unittest End :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     auto r2 = [0,1,2,3,4];
@@ -664,8 +659,8 @@ TakeWhile!(pred, R, AT) takeWhile(alias pred, R, AT...)(R range, AT args) if (is
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("unittest End :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0, 1, 2, 3, 4, 4, 6, 1, 1, 1, 0];
     auto tw1 = takeWhile!"a < 6"(r1); // unary predicate
@@ -699,8 +694,8 @@ auto takeUntil(alias pred, R, T...)(R range, T args)if(isForwardRange!R)
 }
 
 unittest{
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0, 1, 2, 3, 4, 4, 6, 1, 1, 1, 0];
     auto tw1 = takeUntil!"a > 6"(r1); // unary predicate
@@ -763,8 +758,8 @@ R tail(R)(R range) if (isInputRange!R)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,1,2,3];
     auto tails = [r][];
@@ -818,8 +813,8 @@ template Tails(R) if (isForwardRange!R)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,1,2,3];
     auto t = tails(r);
@@ -886,8 +881,8 @@ struct HeadsStruct(R) if (isForwardRange!R && !hasLength!R)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,1,2,3];
     auto h = heads(r);
@@ -942,8 +937,8 @@ auto insertAt(R, E)(size_t n, R range, E element) if (isForwardRange!R && is(Ele
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3];
     auto m = map!"a*a"(r1);
@@ -1003,8 +998,8 @@ Tuple!(ElementType!R[], R) cutAt(R)(size_t index, R range) if (isForwardRange!R 
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5]; // Cutting an array (range with length and slicing)
     auto c1 = cutAt(3, r1);
@@ -1064,8 +1059,8 @@ Tuple!(ElementType!(R)[], R) cutWhen(alias pred, R)(R range) if (isForwardRange!
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     auto cut = cutWhen!"a<3"(r1);
@@ -1265,8 +1260,8 @@ Knit!(R) knit(R...)(R ranges) if (allSatisfy!(isInputRange, R))
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5];
     auto r2 = [3.14, 2.78, 0.25, -1.0, 0.0];
@@ -1344,8 +1339,8 @@ template StitchType(R...) if (allSatisfy!(isTupleRange, R))
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5];
     auto r2 = [0.1, 0.2, 0.3, 0.4];
@@ -1397,8 +1392,8 @@ auto twist(int n, R)(R range) if (isTupleRange!R)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     auto r2 = [3.14, 2.78, 1.414];
@@ -1444,8 +1439,8 @@ auto reverse(R)(R range) if (isTupleRange!R)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     auto r2 = [3.14, 2.78, 1.414];
@@ -1504,8 +1499,8 @@ template SpliceType(size_t n, R1, R2)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     auto s = ["a","b","c","d","e","f"];
@@ -1627,8 +1622,8 @@ template shred(idx...){
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     auto r2 = [3.14, 2.78,1.414];
@@ -1673,8 +1668,8 @@ TMapType!("a", R) untuplify(R)(R range) if (isTupleRange!R && ElementType!R.Type
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
 
@@ -1754,8 +1749,8 @@ Transverse!R transverse(R...)(R ranges) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     auto r2 = repeat(5);
@@ -1790,8 +1785,8 @@ Transverse!(B,Cycle!S) interleave(B, S)(B bigRange, S smallRange) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto i = interleave("abcdef", ",");
     assert(asString(i) == "a,b,c,d,e,f,"); // Yes, there is a "," at the end.
@@ -1992,8 +1987,8 @@ if(isInputRange!(Unqual!Range))
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto a = [0, 1, 2, 3, 4];
     auto sg = segment!1(a);
@@ -2014,6 +2009,16 @@ unittest
     assert(sg[$-1] == tuple(8));
 
     assert(equal(sg[2..4], [tuple(2), tuple(2)]));
+
+    auto sv = sg.save;
+    sv.popFront();
+    assert(equal(sg, [tuple(3), tuple(1), tuple(2), tuple(2), tuple(8)]));
+    assert(equal(sv, [tuple(1), tuple(2), tuple(2), tuple(8)]));
+
+    auto sl = sv[];
+    sv.popFront();
+    assert(equal(sl, [tuple(1), tuple(2), tuple(2), tuple(8)]));
+    assert(equal(sv, [tuple(2), tuple(2), tuple(8)]));
 }
 
 
@@ -2138,8 +2143,54 @@ if (isInputRange!(Unqual!Range)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
+    struct TRange
+    {
+        int _front, _end;
+        @property int front(){return _front;}
+        @property void popFront(){_front += 1;}
+        @property bool empty(){return _front == _end;}
+        @property TRange save(){return this;}
+        @property size_t length(){return _end - _front;}
+    }
+
+    auto tr = TRange(0, 5);
+    auto sg2 = segment!2(tr);
+    assert(equal(sg2, [tuple(0, 1), tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+
+    auto sg2sv = sg2.save;
+    sg2sv.popFront();
+    assert(equal(sg2, [tuple(0, 1), tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+    assert(equal(sg2sv, [tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+
+    assert(sg2.length == 4);
+
+    auto sg3 = segment!3(tr);
+    assert(equal(sg3, [tuple(0, 1, 2), tuple(1, 2, 3), tuple(2, 3, 4)]));
+    assert(sg3.length == 3);
+
+    auto sg4 = segment!4(tr);
+    assert(equal(sg4, [tuple(0, 1, 2, 3), tuple(1, 2, 3, 4)]));
+    assert(sg4.length == 2);
+
+    auto sg5 = segment!5(tr);
+    assert(equal(sg5, [tuple(0, 1, 2, 3, 4)]));
+    assert(sg5.length == 1);
+
+    auto sg6 = segment!6(tr);
+    assert(sg6.empty);
+    assert(sg6.length == 0);
+
+    auto tremp = TRange(0, 0);
+    assert(tremp.empty);
+    assert(segment!2(tremp).empty);
+}
+unittest
+{
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     struct TRange
     {
@@ -2179,49 +2230,8 @@ unittest
 }
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
-
-    struct TRange
-    {
-        int _front, _end;
-        @property int front(){return _front;}
-        @property void popFront(){_front += 1;}
-        @property bool empty(){return _front == _end;}
-        @property TRange save(){return this;}
-        @property size_t length(){return _end - _front;}
-    }
-
-    auto tr = TRange(0, 5);
-    auto sg2 = segment!2(tr);
-    assert(equal(sg2, [tuple(0, 1), tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
-
-    assert(sg2.length == 4);
-
-    auto sg3 = segment!3(tr);
-    assert(equal(sg3, [tuple(0, 1, 2), tuple(1, 2, 3), tuple(2, 3, 4)]));
-    assert(sg3.length == 3);
-
-    auto sg4 = segment!4(tr);
-    assert(equal(sg4, [tuple(0, 1, 2, 3), tuple(1, 2, 3, 4)]));
-    assert(sg4.length == 2);
-
-    auto sg5 = segment!5(tr);
-    assert(equal(sg5, [tuple(0, 1, 2, 3, 4)]));
-    assert(sg5.length == 1);
-
-    auto sg6 = segment!6(tr);
-    assert(sg6.empty);
-    assert(sg6.length == 0);
-
-    auto tremp = TRange(0, 0);
-    assert(tremp.empty);
-    assert(segment!2(tremp).empty);
-}
-unittest
-{
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     struct TRange
     {
@@ -2261,6 +2271,16 @@ unittest
     assert(equal(sg3, [tuple(0, 1, 2), tuple(1, 2, 3), tuple(2, 3, 4)]));
     sg3.front = tuple(2, 3, 1);
     assert(equal(sg3, [tuple(2, 3, 1), tuple(3, 1, 3), tuple(1, 3, 4)]));
+
+    auto sl3 = sg3[];
+    sl3.popFront();
+    assert(equal(sg3, [tuple(2, 3, 1), tuple(3, 1, 3), tuple(1, 3, 4)]));
+    assert(equal(sl3, [tuple(3, 1, 3), tuple(1, 3, 4)]));
+
+    auto sv3 = sg3.save;
+    sv3.popFront();
+    assert(equal(sg3, [tuple(2, 3, 1), tuple(3, 1, 3), tuple(1, 3, 4)]));
+    assert(equal(sv3, [tuple(3, 1, 3), tuple(1, 3, 4)]));
 
     assert(sg3.length == 3);
     sg3.popFront();
@@ -2321,7 +2341,7 @@ if(isRandomAccessRange!(Unqual!Range)
         }
 
         
-        @property bool empty()
+        @property bool empty() const
         {
             return (cast(int)_bidx - cast(int)_fidx) < 0;
         }
@@ -2347,15 +2367,17 @@ if(isRandomAccessRange!(Unqual!Range)
         }
         
         
-        @property Segment save()
+        @property Segment save() const
         {
-            Segment dst = this;
+            Segment dst = cast(Segment)this;
             dst._range = dst._range.save;
+            dst._front = dst._front.dup;
+            dst._back = dst._back.dup;
             return dst;
         }
       
 
-        @property size_t length()
+        @property size_t length() const
         {
             return _bidx - _fidx + 1;
         }
@@ -2364,29 +2386,30 @@ if(isRandomAccessRange!(Unqual!Range)
         alias length opDollar;
       
 
-        @property auto opSlice()
+        @property auto opSlice() const
         {
             return save;
         }
 
 
-        @property Segment opSlice(size_t i, size_t j)
+        @property Segment opSlice(size_t i, size_t j) const
         {
-            Segment dst = this;
+            Segment dst = this.save;
             dst._fidx += i;
-            dst._bidx = dst._fidx + (j - i);
+            dst._bidx -= this.length - j;
 
+            dst.reConstruct();
             return dst;
         }
       
 
-        @property Tuple!(TypeNuple!(E, N)) front()
+        @property Tuple!(TypeNuple!(E, N)) front() const
         {
             return (cast(typeof(return)[])(cast(ubyte[])_front))[0];
         }
 
 
-        @property Tuple!(TypeNuple!(E, N)) back()
+        @property Tuple!(TypeNuple!(E, N)) back() const
         {
             return (cast(typeof(return)[])(cast(ubyte[])_back))[0];
         }
@@ -2448,8 +2471,8 @@ if(isRandomAccessRange!(Unqual!Range)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5];
     auto s = segment!2(r1);
@@ -2462,11 +2485,24 @@ unittest
     assert(s[2] == tuple(2,0));    // it affects its neighbors.
     assert(s[4] == tuple(0,5));
     assert(r1 == [0,1,2,0,0,5][]); // affects r1 back (no .dup internally)
+
+    s = segment!2(r1);
+    s.front = tuple(2, 0);
+    assert(s[0] == tuple(2, 0));
+
+    s.back = tuple(100, 500);
+    assert(s[s.length - 1] == tuple(100, 500));
+
+    auto sl = s[];
+    assert(equal(sl, s));
+    sl.popFront();
+    sl.popBack();
+    assert(equal(sl, s[1 .. s.length - 1]));
 }
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto st = ["a","b","c","d","e","f"];
     auto s2 = segment!3(st);
@@ -2474,8 +2510,8 @@ unittest
 }
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5]; // regenerates r1
     auto s3 = segment!1(r1);
@@ -2487,8 +2523,8 @@ unittest
 }
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int[] e;
     auto s5 = segment!2(e);
@@ -2496,8 +2532,8 @@ unittest
 }
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto ri = iota(0, 5);
     auto sg = segment!2(ri);
@@ -2510,11 +2546,11 @@ unittest
     assert(sg.length == 4);
 }
 
-
 ///ditto
 template segment(size_t N, Range)
 if(isRandomAccessRange!(Unqual!Range)
-&& !isBidirectionalRange!(Unqual!Range))
+&& !isBidirectionalRange!(Unqual!Range)
+&& isInfinite!(Unqual!Range))
 {
     Segment segment(Range range)
     {
@@ -2620,30 +2656,49 @@ if(isRandomAccessRange!(Unqual!Range)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     struct TRange
     {
-        size_t a;
+        int[] a, s;
 
-        @property size_t front(){return a;}
+        this(int[] r){
+            a = r.save;
+            s = r.save;
+        }
+
+        @property ref int front(){return a.front;}
         enum bool empty = false;
-        void popFront(){++a;}
+        void popFront(){a.popFront; if(a.empty)a = s;}
         @property typeof(this) save(){return this;}
-        size_t opIndex(size_t i){return a + i;}
+        ref int opIndex(size_t i){return a[i%s.length];}
     }
 
     
-    auto r = segment!2(TRange.init);
+    auto r = segment!2(TRange([0, 1, 2, 3, 4]));
     assert(equal(r.take(4), [tuple(0, 1), tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+
+    auto sv = r.save;
+    sv.popFront();
+    assert(equal(r.take(4), [tuple(0, 1), tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+    assert(equal(sv.take(3), [tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+
+    assert(r[2] == tuple(2, 3));
+    assert(r[0] == tuple(0, 1));
+
+    r.front = tuple(100, 50);
+    assert(equal(r.take(4), [tuple(100, 50), tuple(50, 2), tuple(2, 3), tuple(3, 4)]));
+
+    r[1] = tuple(10, 20);
+    assert(equal(r.take(4), [tuple(100, 10), tuple(10, 20), tuple(20, 3), tuple(3, 4)]));
 }
 
 
 ///ditto
 template segment(size_t N, Range)
 if(isBidirectionalRange!(Unqual!Range)
-&& (isRandomAccessRange!(Unqual!Range) ? !hasLength!(Unqual!Range) : true))
+&& (isRandomAccessRange!(Unqual!Range) ? (!hasLength!(Unqual!Range) && isInfinite!(Unqual!Range)) : true))
 {
     Segment segment(Range range)
     {
@@ -2663,8 +2718,25 @@ if(isBidirectionalRange!(Unqual!Range)
         E[] _front;
         E[] _back;
 
-      static if(assE)
+      static if(assE || isRandomAccessRange!R)
         R _assignRange;
+
+      static if(assE || isRandomAccessRange!R)
+        void reConstruct(){
+            _front.length = 0;
+            _back.length = 0;
+
+            _fRange = _assignRange.save;
+            _bRange = _assignRange.save;
+
+            for(int i = 0; i < N && !_fRange.empty; ++i, _fRange.popFront())
+                _front ~= _fRange.front();
+
+            for(int i = 0; i < N && !_bRange.empty; ++i, _bRange.popBack())
+                _back ~= _bRange.back();
+
+            _back = _back.reverse;
+        }
 
 
 
@@ -2674,7 +2746,7 @@ if(isBidirectionalRange!(Unqual!Range)
             _fRange = range.save;
             _bRange = range.save;
 
-          static if(assE)
+          static if(assE || isRandomAccessRange!R)
             _assignRange = range.save;
 
             for(int i = 0; i < N && !_fRange.empty; ++i, _fRange.popFront())
@@ -2685,7 +2757,10 @@ if(isBidirectionalRange!(Unqual!Range)
             _back = _back.reverse;
         }
 
-
+        
+      static if(isInfinite!R)
+        enum bool empty = false;
+      else
         @property bool empty()
         {
             return (_front.length < N) || (_back.length < N);
@@ -2703,7 +2778,7 @@ if(isBidirectionalRange!(Unqual!Range)
               _bRange.popFront();
             }
 
-          static if(assE)
+          static if(assE || isRandomAccessRange!R)
             _assignRange.popFront();
         }
 
@@ -2719,7 +2794,7 @@ if(isBidirectionalRange!(Unqual!Range)
               _bRange.popBack();
             }
 
-          static if(assE)
+          static if(assE || isRandomAccessRange!R)
             _assignRange.popBack();
         }
         
@@ -2757,7 +2832,7 @@ if(isBidirectionalRange!(Unqual!Range)
         }
 
 
-          static if(assE)
+        static if(assE || isRandomAccessRange!R)
           @property auto opSlice(size_t i, size_t j)
           {
               return segment!N(_assignRange[i..j + (N-1)]);
@@ -2778,6 +2853,19 @@ if(isBidirectionalRange!(Unqual!Range)
         }
 
 
+      static if(isRandomAccessRange!R)
+        Tuple!(TypeNuple!(E, N)) opIndex(size_t i)
+        {
+            E[] dst;
+
+            foreach(j; 0..N)
+                dst ~= _assignRange[i + j];
+
+            return (cast(typeof(return)[])(cast(ubyte[])dst))[0];
+        }
+
+
+
       static if(assE)
       {
         @property void front(Tuple!(TypeNuple!(E, N)) e)
@@ -2787,6 +2875,8 @@ if(isBidirectionalRange!(Unqual!Range)
 
             for(int i = 0; i < N; ++i, _tmp.popFront())
                 _tmp.front = _front[i];
+
+            reConstruct();
         }
 
 
@@ -2795,8 +2885,19 @@ if(isBidirectionalRange!(Unqual!Range)
             R _tmp = _assignRange.save;
             _back = [e.field];
 
-            for(int i = N-1; i >= 0; ++i, _tmp.popBack())
-                _tmp.back = _front[i];
+            for(int i = N-1; i >= 0; --i, _tmp.popBack())
+                _tmp.back = _back[i];
+
+            reConstruct();
+        }
+
+        static if(isRandomAccessRange!R)
+        void opIndexAssign(Tuple!(TypeNuple!(E, N)) e, size_t i)
+        {
+            foreach(j; 0..N)
+                _assignRange[i + j] = [e.field][j];
+
+            reConstruct();
         }
       }
     }
@@ -2804,8 +2905,8 @@ if(isBidirectionalRange!(Unqual!Range)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     struct TRange{
         int[] a;
@@ -2830,6 +2931,15 @@ unittest
     assert(sg.length == 3);
     assert(!sg.empty);
 
+    auto sv = sg.save;
+    sv.popFront();
+    assert(equal(sg, [tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+    assert(equal(sv, [tuple(2, 3), tuple(3, 4)]));
+    assert(sg.length == 3);
+    assert(sv.length == 2);
+    assert(!sg.empty);
+    assert(!sv.empty);
+
     sg.popFront();
     assert(equal(sg, [tuple(2, 3), tuple(3, 4)]));
     assert(sg.length == 2);
@@ -2846,8 +2956,8 @@ unittest
 }
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     struct TRange{
         int[] a;
@@ -2868,6 +2978,17 @@ unittest
     assert(equal(retro(sg), [tuple(3, 4), tuple(2, 3), tuple(1, 2), tuple(0, 1)]));
     assert(sg.length == 4);
     assert(equal(sg[2..4], [tuple(2, 3), tuple(3, 4)]));
+
+    auto sgsv = sg.save;
+    sgsv.popFront();
+    assert(equal(sg, [tuple(0, 1), tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+    assert(equal(sgsv, [tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+
+    auto sgsv2 = sg[];
+    sgsv2.popFront();
+    assert(equal(sg, [tuple(0, 1), tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+    assert(equal(sgsv2, [tuple(1, 2), tuple(2, 3), tuple(3, 4)]));
+
 
     sg.front = tuple(2, 2);
     assert(equal(sg, [tuple(2, 2), tuple(2, 2), tuple(2, 3), tuple(3, 4)]));
@@ -2891,14 +3012,25 @@ unittest
     assert(sg.length == 1);
     assert(!sg.empty);
 
+    sg.front = tuple(2, 5);
+    assert(equal(sg, [tuple(2, 5)]));
+    assert(equal(retro(sg), [tuple(2, 5)]));
+    assert(sg.length == 1);
+    assert(!sg.empty);
+
+    sg.front = tuple(2, 1);
+    assert(equal(sg, [tuple(2, 1)]));
+    assert(sg.length == 1);
+    assert(!sg.empty);
+
     sg.popFront();
     assert(sg.length == 0);
     assert(sg.empty);
 }
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     struct TRange{
         int[] a;
@@ -2930,9 +3062,15 @@ unittest
     assert(sg.length == 2);
     assert(!sg.empty);
 
+    sg.back = tuple(4, 4, 4);
+    assert(equal(sg, [tuple(2, 4, 4), tuple(4, 4, 4)]));
+    assert(equal(sg.retro, [tuple(2, 4, 4), tuple(4, 4, 4)].retro));
+    assert(sg.length == 2);
+    assert(!sg.empty);
+
     sg.popFront();
-    assert(equal(sg, [tuple(2, 3, 4)]));
-    assert(equal(sg.retro, [tuple(2, 3, 4)].retro));
+    assert(equal(sg, [tuple(4, 4, 4)]));
+    assert(equal(sg.retro, [tuple(4, 4, 4)].retro));
     assert(sg.length == 1);
     assert(!sg.empty);
 
@@ -2942,44 +3080,65 @@ unittest
 }
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    ////scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     struct TRange{
-        int[] a;
-        @property ref int front(){return a.front;}
-        @property bool empty(){return a.empty;}
-        void popFront(){a.popFront();}
-        void popBack(){a.popBack();}
-        @property ref int back(){return a.back();}
-        @property TRange save(){return TRange(a.save);}
-        TRange opSlice(size_t i, size_t j){return TRange(a[i..j]);}
-        ref int opIndex(size_t i){return a[i];}
+        size_t f, b;
+        int[] s;
+
+        this(int[] r){
+            f = 0;
+            s = r;
+            b = s.length - 1;
+        }
+
+        @property ref int front(){return s[f];}
+        enum bool empty = false;
+        void popFront(){++f; if(f == s.length)f = 0;}
+        void popBack(){b = (b == 0 ? s.length - 1 : b-1);}
+        @property ref int back(){return s[b];}
+        @property typeof(this) save(){return this;}
+        auto opSlice(size_t i, size_t j){auto dst = this; dst.popFrontN(i); return dst.take(j - i);}
+        ref int opIndex(size_t i){return s[(i+f)%s.length];}
     }
+
+    alias TRange Range;
+    static assert(isInputRange!TRange);
 
     auto r = TRange([0, 1, 2, 3, 4]);
     auto sg = segment!3(r);
-    assert(equal(sg, [tuple(0, 1, 2), tuple(1, 2, 3), tuple(2, 3, 4)]));
-    assert(equal(retro(sg), [tuple(0, 1, 2), tuple(1, 2, 3), tuple(2, 3, 4)].retro));
-    assert(equal(sg[2..3], [tuple(2, 3, 4)]));
+    assert(equal(sg.take(3), [tuple(0, 1, 2), tuple(1, 2, 3), tuple(2, 3, 4)]));
+    assert(equal(retro(sg).take(3), [tuple(2, 3, 4), tuple(1, 2, 3), tuple(0, 1, 2)]));
+    assert(sg[2] == tuple(2, 3, 4));
+    //assert(equal(sg[2..3], [tuple(2, 3, 4)]));
 
-    sg.front = tuple(2, 2, 2);
-    assert(equal(sg, [tuple(2, 2, 2), tuple(2, 2, 3), tuple(2, 3, 4)]));
-    assert(equal(sg.retro, [tuple(2, 2, 2), tuple(2, 2, 3), tuple(2, 3, 4)].retro));
+    sg.front = tuple(2, 2, 2); //[2, 2, 2, 3, 4]
+    assert(equal(sg.take(3), [tuple(2, 2, 2), tuple(2, 2, 3), tuple(2, 3, 4)]));
+    assert(equal(retro(sg).take(3), [tuple(2, 3, 4), tuple(2, 2, 3), tuple(2, 2, 2)]));
 
     sg.popFront();
-    assert(equal(sg, [tuple(2, 2, 3), tuple(2, 3, 4)]));
-    assert(equal(sg.retro, [tuple(2, 2, 3), tuple(2, 3, 4)].retro));
+    assert(equal(sg.take(3), [tuple(2, 2, 3), tuple(2, 3, 4), tuple(3, 4, 2)]));
+    assert(equal(retro(sg).take(3), [tuple(2, 3, 4), tuple(2, 2, 3), tuple(2, 2, 2)]));
     assert(!sg.empty);
 
-    sg.popFront();
-    assert(equal(sg, [tuple(2, 3, 4)]));
-    assert(equal(sg.retro, [tuple(2, 3, 4)].retro));
+    sg[1] = tuple(3, 3, 3); //[2, 2, 3, 3, 3] 
+    assert(equal(sg.take(3), [tuple(2, 3, 3), tuple(3, 3, 3), tuple(3, 3, 2)]));
+    assert(equal(sg.retro.take(3), [tuple(3, 3, 3), tuple(2, 3, 3), tuple(2, 2, 3)]));
     assert(!sg.empty);
 
-    sg.popFront();
-    assert(sg.empty);
+    sg.back = tuple(2, 3, 4);//[2, 2, 2, 3, 4]
+    assert(equal(sg.take(3), [tuple(2, 2, 3), tuple(2, 3, 4), tuple(3, 4, 2)]));
+    assert(equal(sg.retro.take(3), [tuple(2, 3, 4), tuple(2, 2, 3), tuple(2, 2, 2)]));
+    assert(!sg.empty);
+
+    sg.popBack();
+    assert(equal(sg.take(3), [tuple(2, 2, 3), tuple(2, 3, 4), tuple(3, 4, 2)]));
+    assert(equal(sg.retro.take(3), [tuple(2, 2, 3), tuple(2, 2, 2), tuple(4, 2, 2)]));
+    assert(!sg.empty);
 }
+
+
 
 /**
 A generalization of segment: given an array of indices (as template argument) and a range,
@@ -3042,8 +3201,8 @@ Knit!(TypeNuple!(R, array.length)) delay(alias array, R)(R range) if (isForwardR
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5];
     auto d = delay!([0,1])(r1); // will iterate on the pair ([0,1,2,3,4,5], [1,2,3,4,5]).
@@ -3092,8 +3251,8 @@ Knit!(TypeNuple!(R, n)) parallel(size_t n, R)(R range) if (isForwardRange!R && n
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5];
     auto p = parallel!4(r1);
@@ -3198,8 +3357,8 @@ R concat(R)(R range) if (isSimpleRange!R) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int[][] r1 = [[0,1,2], [3,4], [5]];
     auto c = concat(r1);
@@ -3269,8 +3428,8 @@ template FlattenType(size_t n,R)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [[0,1,2], [3,4], [5]];
     auto f = flatten(r1);
@@ -3319,8 +3478,8 @@ void truncate(R...)(ref R r) if (allHaveLength!R && !allAreInfinite!R && allSati
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3];
     auto s = ["a","b","c","d","e","f","g","h","i","j","k"];
@@ -3353,8 +3512,8 @@ Knit!(Numbers, R) indexed(R)(R range) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto s = ["a", "b", "c", "d", "e", "f"];
     auto e = indexed(s); // (0,"a"), (1,"b"), (2,"c"), (3,"d"), (4, "e"), (5, "f")
@@ -3430,8 +3589,8 @@ Numbers numbers(int from, int to, int step = 1) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto n0 = numbers();
     assert(equal(take(n0, 5), [0,1,2,3,4][]));
@@ -3520,8 +3679,8 @@ Numberz!T numberz(T)(T from, T to, T step) {
 /+
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto n1 = numberz(BigInt("1000000000000000"), BigInt("2000000000000000"), BigInt("1"));
     // -> 1000000000000000, 1000000000000001, 1000000000000002, 1000000000000003, ..., 1000000000000010
@@ -3559,8 +3718,8 @@ struct NaturalNumbers {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     assert(equal(take(NaturalNumbers(), 7), [0,1,-1,2,-2,3,-3][]));
 }
@@ -3605,8 +3764,8 @@ EmptyRange!T emptyRange(T)() {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto e = emptyRange!int; //uses the helper function. Otherwise: auto e = EmptyRange!int();
     assert(e.empty);
@@ -3666,8 +3825,8 @@ Once!T once(T)(T value) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto e = once(1.1);
     assert(e.front == 1.1);
@@ -3860,8 +4019,8 @@ auto replicateRange(R)(R range, uint n = 1) if (isForwardRange!R) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3];
     auto r2 = replicateRange(r1, 3);
@@ -4006,8 +4165,8 @@ Concat!(Map!(unaryFun!(Format!("array(repeat(a, %s))", n)), R)) stutter2(size_t 
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3];
     string s = "abc";
@@ -4084,8 +4243,8 @@ Extremities!R extremities(R)(R range) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5,6];
     auto ext = extremities(r1);
@@ -4119,8 +4278,8 @@ auto bounce(R)(R range) if (isBidirectionalRange!R)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,1,2,3];
     auto b = bounce(r);
@@ -4186,8 +4345,8 @@ Without!(R1,R2) without(R1, R2)(R1 range1, R2 range2, bool cyclic = false) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5,6,2,3,4];
 
@@ -4271,8 +4430,8 @@ AsSet!R asSet(R)(R range)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     assert(equal(asSet([0,0,1,2,2,3,3,4,5,5,6,9,1,2,4,9][]), [0,1,2,3,4,5,6,9][]));
     assert(equal(asSet(take(cycle([4,5,6][]), 1000)), [4,5,6][]));
@@ -4314,8 +4473,8 @@ size_t smallestLengthImpl(R, Rest...)(size_t currentLength, R range0, Rest rest)
 }
 
 unittest {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     string s = "abc";
@@ -4376,8 +4535,8 @@ void forEach(alias fun, R)(R range) if (isInputRange!R) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     int sum;
@@ -4427,8 +4586,8 @@ string asString(R)(R range, string pre, string sep, string post) if (isInputRang
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3];
     string r2 = "abcdef";
@@ -4786,8 +4945,8 @@ public:
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int[] a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     auto sna = splitN(a, 3);
@@ -4855,8 +5014,8 @@ if(isInputRange!R && is(ElementType!(Unqual!R) == ubyte))
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    //scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    //scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int[] a = [1, 2, 3, 4, 5];
     ubyte[] ubs = cast(ubyte[])a;

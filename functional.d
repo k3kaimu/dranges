@@ -229,9 +229,9 @@ template isNotVoid(T)
 struct FlipnR(alias fun)
 {
     size_t n;
-    typeof(fun(R.init, 0)) opCall(R)(R r) if (isForwardRange!R)// && is(typeof(fun(r,n))))
+    auto opCall(R)(R r) if (isForwardRange!R)// && is(typeof(fun(r,n))))
     {
-        return fun(r,n);
+        return fun(r, n);
     }
 }
 
@@ -260,24 +260,23 @@ unittest
 {
     auto rr = [[0,1,2,3,4,5],[6,7,8,9], [10]];
 
-    alias flipn!take takeN; // takeN is a higher-order function, waiting for a number of elements to take.
+    alias flipn!(std.range.take) takeN; // takeN is a higher-order function, waiting for a number of elements to take.
     auto take3 = takeN(3);  // take3 is a generic function, taking 3 elements on any range (returns take(range,3))
 
-    auto threes = map!take3(rr); // get the first three elements of each range
+    //auto threes = map!take3(rr); // get the first three elements of each range
     auto witness = [[0,1,2],[6,7,8],[10]];
-    foreach(elem; witness)
-    {
-        assert(equal(elem, threes.front));
-        threes.popFront;
-    }
+    foreach(i; 0..3)
+        assert(equal(witness[i], take3(rr[i])));
 
     auto take0 = takeN(0);
     auto zeroes = map!take0(rr);
-    foreach(elem; zeroes) assert(elem.empty);
+    foreach(i; 0..3)
+        assert(equal((int[]).init, take0(rr[i])));
 
     auto take100 = takeN(100);
     auto all = map!take100(rr);
-    foreach(elem; rr) {assert(equal(elem, all.front)); all.popFront;}
+    foreach(i; 0..3)
+        assert(equal(rr[i], take100(rr[i])));
 }
 
 
@@ -1435,7 +1434,7 @@ template CompatibilityFuncArgs(alias fun, ARGS...) if (!isFunction!(fun)) {
     else {
         enum bool CompatibilityFuncArgs = __traits(compiles, {
                                                                 ARGS args;
-                                                                fun!(ARGS)(args);
+                                                                fun(args);
                                                             }
                                                    );
     }

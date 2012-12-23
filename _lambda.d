@@ -73,13 +73,14 @@ $(UL
 )
 */
 
-module dranges.lambda;
+module dranges._lambda;
 
 import std.typetuple : staticMap;
 import dranges.typetuple : Init;
 
 // The following imports are only to ease the use of opDispatch. They are not necessary for lambdas.
 import std.array, std.string;
+
 
 template isExpr(T)
 {

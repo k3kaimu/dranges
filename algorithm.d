@@ -44,12 +44,6 @@ import dranges.functional,
        dranges.traits,
        dranges.typetuple;
 
-version(unittest)
-{
-    pragma(lib, "dranges");
-    void main(){}
-}
-
 /**
 Small one-liners to use reduce. Sum and product work on empty ranges (they return 0 and 1, respectively),
 but not minOf and maxOf.
@@ -620,6 +614,7 @@ if(__traits(compiles, nfilter!(fun, step)(R.init)))
 
 unittest
 {
+    import std.stdio;
     scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
     
     auto r1 = [0,1,2,3,3,5,4,3,2,1,0];

@@ -12,7 +12,7 @@ Authors:   Philippe Sigaud
 Distributed under the Boost Software License, Version 1.0.
 (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 */
-module dranges.phobos_extension;
+module dranges._phobos_extension;
 
 import std.c.string; // to give the templates access to c.string as template parameters
 import std.algorithm,
