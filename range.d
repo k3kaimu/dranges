@@ -5251,6 +5251,15 @@ if(!isForwardRange!(Unqual!Range) && isInputRange!(Unqual!Range) )
             }
 
             _slice[0] = min;
+
+            size_t t = _slice[0] / _buf.length;
+            if(t){
+                _slice[0] -= t * _buf.length;
+                _slice[1] -= t * _buf.length;
+
+                foreach(k; _idxs.keys)
+                    _idxs[k] -= t * _buf.length;
+            }
         }
 
 
