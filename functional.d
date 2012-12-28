@@ -1950,14 +1950,16 @@ if(__traits(compiles, fun.stringof[0..8] == "__lambda") && fun.stringof[0..8] ==
     }
 }*/
 
-/***********************************************************************************
- * Reverses the order of the function's arguments
- * 
- * Example:
- * ---
- * assert(iota(1, 10).ReverseParameter!(reduce!"a + b")(1) == 46);
- * ---
- ***********************************************************************************/
+/**
+Reverses the order of the function's arguments.
+
+Example:
+---
+assert(iota(1, 10).ReverseParameter!(reduce!"a + b")(1) == 46);
+---
+
+Authors: Kazuki Komatsu(k3_kaimu)
+*/
 template ReverseParameter(alias fun, Param...){
     string createArgs(size_t N){
         string dst;
@@ -1966,6 +1968,7 @@ template ReverseParameter(alias fun, Param...){
         return dst[0..$-1];
     }
 
+
     auto ReverseParameter(T...)(T args){
         static if(Param.length == 0)
             return mixin("fun(" ~ createArgs(T.length) ~ ")");
@@ -1973,6 +1976,7 @@ template ReverseParameter(alias fun, Param...){
             return mixin("fun!Param(" ~ createArgs(T.length) ~ ")");
     }
 }
+
 unittest{
     assert(iota(1, 10).ReverseParameter!(reduce!"a + b")(1) == 46);
     assert(iota(1, 10).ReverseParameter!(reduce, "a + b")(1) == 46);

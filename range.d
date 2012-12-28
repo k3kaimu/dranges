@@ -5496,9 +5496,11 @@ public:
         super( (){dlg(this);} );
     }
 
+
     this(void function(typeof(this)) fn){
         super( (){fn(this);} );
     }
+
 
     void opAssign(T v){
         _value = v;
@@ -5533,19 +5535,23 @@ template yieldRange(T){
             popFront();
         }
 
+
         this(void function(Yield!T) dlg){
             _yield = new Yield!T(dlg);
             popFront();
         }
+
 
         @property
         auto ref front(){
             return _yield._value;
         }
 
+
         void popFront(){
             _yield.call();
         }
+
 
         @property
         bool empty(){
