@@ -23,6 +23,8 @@ Distributed under the Boost Software License, Version 1.0.
 */
 module dranges.range;
 
+import core.thread : Fiber;
+
 import std.algorithm,
        std.array,
        std.bigint,
@@ -5081,6 +5083,7 @@ Authors: Kazuki Komatsu(k3_kaimu)
 template interpret(T, R)
 if(isInputRange!R && is(ElementType!(Unqual!R) == ubyte))
 {
+    ///ditto
     auto interpret(R range)
     {
         return map!convFun(splitN(range, T.sizeof));
@@ -5126,7 +5129,7 @@ struct IRange{
 
     this(size_t limit){
         _f = new size_t;
-        *_f = 0;
+        (*_f) = 0;
         _l = limit;
     }
 
@@ -5160,6 +5163,7 @@ template toForwardRange(Range) if(isForwardRange!(Unqual!Range))
 template toForwardRange(Range)
 if(!isForwardRange!(Unqual!Range) && isInputRange!(Unqual!Range) )
 {
+    ///ditto
     ToForwardRanged toForwardRange(Range r)
     {
         return ToForwardRanged(r);
@@ -5446,4 +5450,133 @@ unittest{
 
     assert(r41.empty);
     assert(r42.empty);
+}
+
+
+
+/**
+"yield" as in Python, Ruby or C#.
+
+Example:
+---
+auto r1 = {
+    void func(Yield!int yield){
+        foreach(i; 0 .. 100)
+            yield = i;
+    }
+    
+    return yieldRange(&func);
+}();
+
+assert(equal(r1, iota(100)));
+
+
+auto r2 = {
+    void func(Yield!int yield){
+        foreach(i; 0 .. 100)
+            if(i&1)
+                yield = i;
+    }
+    
+    return yieldRange(&func);
+}();
+
+assert(equal(r2, filter!"a&1"(iota(100))));
+---
+
+Authors: Kazuki Komatsu(k3_kaimu)
+*/
+class Yield(T) : Fiber{
+private:
+    T _value;
+
+
+public:
+    this(void delegate(typeof(this)) dlg){
+        super( (){dlg(this);} );
+    }
+
+    this(void function(typeof(this)) fn){
+        super( (){fn(this);} );
+    }
+
+    void opAssign(T v){
+        _value = v;
+        this.yield();
+    }
+}
+
+
+///ditto
+template yieldRange(T){
+    import core.thread : Fiber;
+
+    ///ditto
+    YieldRange yieldRange(void delegate(Yield!T) dlg){
+        return YieldRange(dlg);
+    }
+
+
+    ///ditto
+    YieldRange yieldRange(void function(Yield!T) dlg){
+        return YieldRange(dlg);
+    }
+
+
+    struct YieldRange{
+    private:
+        Yield!T _yield;
+
+    public:
+        this(void delegate(Yield!T) dlg){
+            _yield = new Yield!T(dlg);
+            popFront();
+        }
+
+        this(void function(Yield!T) dlg){
+            _yield = new Yield!T(dlg);
+            popFront();
+        }
+
+        @property
+        auto ref front(){
+            return _yield._value;
+        }
+
+        void popFront(){
+            _yield.call();
+        }
+
+        @property
+        bool empty(){
+            return (_yield.state == Fiber.State.TERM);
+        }
+    }
+}
+
+
+unittest{
+    auto r1 = {
+        void func(Yield!int yield){
+            foreach(i; 0 .. 100)
+                yield = i;
+        }
+        
+        return yieldRange(&func);
+    }();
+
+    assert(equal(r1, iota(100)));
+
+
+    auto r2 = {
+        void func(Yield!int yield){
+            foreach(i; 0 .. 100)
+                if(i&1)
+                    yield = i;
+        }
+        
+        return yieldRange(&func);
+    }();
+
+    assert(equal(r2, filter!"a&1"(iota(100))));
 }
