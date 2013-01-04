@@ -1,22 +1,23 @@
-﻿/**
- * this module, you can create "No Name" union and struct.
- * Example:
- * ---
- * import std.stdio;
- * void main(){
- *     Nuple!(int, 3) a;   //NNUnion!(Tuple!(int, int, int), "nuple", int[3], "array")
- *     
- *     foreach(i; 0..3)
- *         a.array[i] = i * 2;
- *     
- *     writeln(a.array);   //[0, 2, 4]
- *     writeln(a.nuple);   //Tuple!(int, int, int)(0, 2, 4)
- * }
- * ---
- * 
- * Authors:   Kazuki Komatsu(k3kaimu)
- * License:   <a href="http://www.boost.org/LICENSE_1_0.txt">Boost License 1.0</a>.
- */
+/**
+this module, you can create "No Name" union and struct.
+
+Example:
+---
+import std.stdio;
+void main(){
+    Nuple!(int, 3) a;   //NNUnion!(Tuple!(int, int, int), "nuple", int[3], "array")
+     
+    foreach(i; 0..3)
+        a.array[i] = i * 2;
+    
+    writeln(a.array);   //[0, 2, 4]
+    writeln(a.nuple);   //Tuple!(int, int, int)(0, 2, 4)
+}
+---
+
+Authors:   Kazuki Komatsu(k3kaimu)
+License:   <a href="http://www.boost.org/LICENSE_1_0.txt">Boost License 1.0</a>.
+*/
 module dranges.nonametype;
 
 import std.conv             : to;
@@ -44,16 +45,16 @@ private string createNNMembers(T...)(){
 }
 
 /**
- * This template create no name union.
- * Example:
- * ---
- * NNUnion!(int[2], "_int", long, "_long") a;
- * 
- * a._int[0] = 12;
- * a._int[1] = 1;
- * assert(a._long == (1L << 32) + 12);
- * ---
- */
+This template create no name union.
+Example:
+---
+NNUnion!(int[2], "_int", long, "_long") a;
+
+a._int[0] = 12;
+a._int[1] = 1;
+assert(a._long == (1L << 32) + 12);
+---
+*/
 template NNUnion(T...)if(T.length && !(T.length&1)){
     mixin("union NNUnion{" ~ createNNMembers!T() ~ "}");
 }
@@ -67,15 +68,16 @@ unittest{
 
 
 /**
- * This templte create no name struct.
- * Example:
- * ---
- * NNStruct!(string, "str", uint, "value");
- * 
- * a.str = "12";
- * a.value = 1111;
- * ---
- */
+This templte create no name struct.
+
+Example:
+---
+NNStruct!(string, "str", uint, "value");
+
+a.str = "12";
+a.value = 1111;
+---
+*/
 template NNStruct(T...)if(T.length && !(T.length&1)){
     mixin("struct NNStruct{" ~ createNNMembers!T() ~ "}");
 }
@@ -88,18 +90,19 @@ unittest{
 
 
 /**
- * This is useful type if you use Tuple!(TypeTuple!(T, N)) in your code. 
- * You can access a tuple element of some one by index.
- * Example:
- * ---
- * Nuple!(int, 3)  npi3;   //union{Tuple!(int, int, int) nuple, int[3] array}
- * 
- * npi3.nuple = tuple(1, 2, 3);
- * 
- * foreach(i; 0..3)
- *     assert(npi3.array[i] == i + 1);
- * --- 
- */
+This is useful type if you use Tuple!(TypeTuple!(T, N)) in your code. 
+You can access a tuple element of some one by index.
+
+Example:
+---
+Nuple!(int, 3)  npi3;   //union{Tuple!(int, int, int) nuple, int[3] array}
+
+npi3.nuple = tuple(1, 2, 3);
+
+foreach(i; 0..3)
+    assert(npi3.array[i] == i + 1);
+--- 
+*/
 template Nuple(T, size_t N){
     alias NNUnion!(Tuple!(TypeNuple!(T, N)), "nuple", T[N], "array") Nuple;
 }

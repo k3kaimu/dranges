@@ -262,9 +262,9 @@ assert(equal(d4, [5][]));
 */
 template dropWhile(alias pred, size_t step = 1){
     alias naryFun!pred predicate;
-    
+
     template dropWhile(R, T...)if(isForwardRange!R){
-        
+
         template ParamGenForArity(size_t N){
                 alias TypeTuple!(TypeNuple!(ElementType!R, N), T) ParamGenForArity;
         }
@@ -3656,7 +3656,7 @@ struct Numbers {
         return Numbers(to!int(index1*_step + _num), to!int(index2*_step + _num));
     }
 
-    @property size_t length() { return (this.empty ? 0 : cast(size_t)((_max-_num)/_step));}
+    @property size_t length() { return (this.empty ? 0 : (cast(size_t)((_max-_num)/_step)) + !!((_max - _num)%_step));}
 }
 
 /// ditto
@@ -3826,12 +3826,13 @@ assert(hasSlicing!(typeof(e)));
 struct EmptyRange(T) {
     enum bool empty = true;
     enum size_t length = 0;
+    @property size_t opDollar(){return 0;}
     @property EmptyRange save() { return this;}
     void popFront() {throw new Exception("EmptyRange is empty: do not call popFront");}
-    T front() {throw new Exception("EmptyRange is empty: do not call front");}
+    @property T front() {throw new Exception("EmptyRange is empty: do not call front"); return T.init;}
     void popBack() {throw new Exception("EmptyRange is empty: do not call popBack");}
-    T back() {throw new Exception("EmptyRange is empty: do not call back");}
-    T opIndex(size_t index) {throw new Exception("EmptyRange is empty: do not call opIndex");}
+    @property T back() {throw new Exception("EmptyRange is empty: do not call back"); return T.init;}
+    T opIndex(size_t index) {throw new Exception("EmptyRange is empty: do not call opIndex"); return T.init;}
     EmptyRange!T opSlice(size_t index1, size_t index2) {return this;}
 
     R opCat(R)(R range) if (isForwardRange!R && is(ElementType!R == T)) { return range;}
@@ -3852,14 +3853,14 @@ unittest
     assert(e.empty);
     assert(e.length == 0);
     assert(asString(e) == "");
-    assert(is(ElementType!(typeof(e)) == int));
+    static assert(is(ElementType!(typeof(e)) == int));
 
-    assert(isInputRange!(typeof(e)));
-    assert(isForwardRange!(typeof(e)));
-    assert(isBidirectionalRange!(typeof(e)));
-    assert(isRandomAccessRange!(typeof(e)));
-    assert(hasLength!(typeof(e)));
-    assert(hasSlicing!(typeof(e)));
+    static assert(isInputRange!(typeof(e)));
+    static assert(isForwardRange!(typeof(e)));
+    static assert(isBidirectionalRange!(typeof(e)));
+    static assert(isRandomAccessRange!(typeof(e)));
+    static assert(hasLength!(typeof(e)));
+    static assert(hasSlicing!(typeof(e)));
 }
 
 /**
@@ -4944,48 +4945,43 @@ SplitN!R splitN(R)(R range, size_t n)
 struct SplitN(Range)
 if(isInputRange!(Unqual!(Range)))
 {
+    alias Unqual!Range R;
+
 private:
-    alias Unqual!(Range) R;
-    alias ElementType!R IE;
-    
     R _input;
     size_t _n;
-    IE[] _front;
 
 public:    
     ///
-    this(R input, size_t n)
-    {
+    this(R input, size_t n){
         _input = input;
         _n = n;
-        
-        popFront();
     }
     
     
     ///range primitive
   static if(isInfinite!R){
-        enum empty = false;
+    enum empty = false;
   }else{
     @property
     bool empty(){
-        return _front.length == 0;
+        return _input.empty;
     }
   }
     
     ///ditto
     void popFront()
     {
-        _front.length = 0;
-        for(int i = 0; (!_input.empty) && (i < _n); _input.popFront(), ++i)
-            _front ~= _input.front;
+        _input.popFrontN(_n);
     }
     
+
     ///ditto
     @property
-    IE[] front(){
-        return _front;
+    auto front(){
+        return take(_input, _n);
     }
+
     
   static if(isForwardRange!R){
     ///ditto
@@ -4993,8 +4989,7 @@ public:
     typeof(this) save(){
         auto dst = this;
         dst._input = dst._input.save();
-        dst._front = dst._front.dup;
-        
+
         return dst;
     }
   }
@@ -5005,22 +5000,24 @@ public:
     ///ditto
     @property
     size_t length(){
-        if(_input.length % _n)
-            return (_input.length / _n + 2);
-        else
-            return (_input.length / _n + 1);
+        return (_input.length / _n) + (((_input.length % _n) == 0) ? 0 : 1);
     }
+
+    alias length opDollar;
   }
   
   
-  static if(hasLength!R && isRandomAccessRange!R)
+  static if(hasSlicing!R && hasLength!R)
   {
     ///ditto
-    IE[] opIndex(size_t idx){
-        if(idx == 0)
-            return _front;
-        else
-            return _input[(idx-1)*_n .. idx*_n > _input.length ? _input.length : idx*_n];
+    auto opIndex(size_t idx){
+        return take(_input[_n * idx .. _input.length], _n);
+    }
+
+
+    ///ditto
+    auto opSlice(size_t a, size_t b){
+        return splitN(_input[a * _n .. min(b * _n, _input.length)], _n);
     }
   }
 }
@@ -5040,6 +5037,9 @@ unittest
     assert(sna[3] == [9, 10]);
     
     assert(sna.length == 4);
+
+    sna = sna[1 .. 4];
+    assert(equal(sna, [[3, 4, 5], [6, 7, 8], [9, 10]]));
     
     
     int[] b = a[0..9];
@@ -5051,7 +5051,37 @@ unittest
     assert(snb[2] == [6, 7, 8]);
     
     assert(snb.length == 3);
+
+    struct RefIota{
+        int* p;
+        int lim;
+
+        this(size_t n){lim = n; p = new int;}
+        @property int front(){return *p;}
+        @property bool empty(){return *p == lim;}
+        void popFront(){++(*p);}
+        @property RefIota save(){RefIota dst = this; dst.p = new int; *(dst.p) = *p; return dst;}
+        @property size_t length(){return lim - *p;}
+        @property RefIota opSlice(size_t a, size_t b){auto dst = save; *(dst.p) += a; dst.lim = *(dst.p) + (b - a); return dst;}
+    }
+
+    auto r = RefIota(9);
+    auto snr = splitN(r, 3);
+    auto check = [[0, 1, 2], [3, 4, 5], [6, 7, 8]];
+
+    auto snrs = snr.save;
+    
+    foreach(i, v; check){
+        assert(!snrs.empty);
+        assert(equal(snrs.front, v));
+        snrs.popFront();
+    }
+
+    snrs = snr.save;
+    foreach(i, v; check)
+        assert(equal(snrs[i], v));
 }
+
 
 /**
 return the range with the element that receives the range in which the elements are ubyte value,
@@ -5453,7 +5483,7 @@ unittest{
 }
 
 
-
+/+
 /**
 "yield" as in Python, Ruby or C#.
 
@@ -5505,6 +5535,13 @@ public:
     void opAssign(T v){
         _value = v;
         this.yield();
+    }
+
+
+    @property
+    auto ref peek(){
+        this.yield();
+        return _value;
     }
 }
 
@@ -5585,4 +5622,19 @@ unittest{
     }();
 
     assert(equal(r2, filter!"a&1"(iota(100))));
-}
+
+    auto r3 = {
+        int sum;
+
+        void func(Yield!int yield){
+            while(1){
+                sum += yield.peek;
+            }
+        }
+
+        return tuple(yieldRange(&func), () => sum);
+    };
+
+    put(r3[0], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    assert(r3[1] ==55);
+}+/

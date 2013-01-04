@@ -245,7 +245,7 @@ template tmap(fun...)if(fun.length >= 1){
         else{
             static assert(fun.length == 1);
             alias InlineTemplate!("alias f", `auto IT(T...)(Tuple!T e){return naryFun!(f)(e.field);}`) nf;
-            return map!(nf!(fun[0]))(knit(args));
+            return map!(Prepare!(fun[0]))(knit(args));
         }
     }
 
@@ -723,6 +723,7 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
     
    
     struct TFilter(T...){
+    private:
         Tuple!T _input;
         
         alias naryFun!(fun) _fun;
@@ -801,6 +802,21 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
         
         static assert(__traits(compiles, _fun(ETS.init)));
         
+        static if(allSatisfy!(hasLength, RangesTypes) || (anySatisfy!(hasLength, RangesTypes) && anySatisfy!(isInfinite, RangesTypes)))
+        {
+            @property auto _length()
+            {
+                alias CommonType!(staticMap!(_lengthType, RangesTypes)) LT;
+                LT m = LT.max;
+                foreach(i, isRange; IndexOfRangeTypeTF){
+                    static if(isRange && !isInfinite!(T[i]))
+                        m = min(m, _input[i].length);
+                }
+                return m;
+            }
+        }
+
+    public:
         this(T input){
             foreach(i, Unused; T)
                 _input.field[i] = input[i];
@@ -813,7 +829,7 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
             
             static if(allSatisfy!(isBidirectionalRange, RangesTypes) && allSatisfy!(hasLength, RangesTypes))
             {
-                auto size = this.length;
+                auto size = this._length;
                 
                 foreach(i, isRange; IndexOfRangeTypeTF){
                     static if(isRange){
@@ -930,22 +946,6 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
             return result;
         }
         
-        static if(allSatisfy!(hasLength, RangesTypes) || (anySatisfy!(hasLength, RangesTypes) && anySatisfy!(isInfinite, RangesTypes)))
-        {
-            @property auto length()
-            {
-                alias CommonType!(staticMap!(_lengthType, RangesTypes)) LT;
-                LT m = LT.max;
-                foreach(i, isRange; IndexOfRangeTypeTF){
-                    static if(isRange && !isInfinite!(T[i]))
-                        m = min(m, _input[i].length);
-                }
-                return m;
-            }
-
-            alias length opDollar;
-        }
-        
         static if(allSatisfy!(isForwardRange, RangesTypes))
         {
             @property auto save()
@@ -1002,7 +1002,7 @@ unittest
     
     //now OK, c is 2
     auto tf6 = tfilter!"!(a%c)"(r1, r2, 2);
-    assert(equal(tf6, [tuple(0, 3.0), tuple(2, 5.0)]));
+    assert(equal(tf6, [tuple(0, 3), tuple(2, 5)]));
     
     //If third parameter is true, this tfilter range includes arguments is not RangeType.
     auto tf7 = tfilter!("!(a%c)", [], true)(r1, r2, 2);
@@ -1741,7 +1741,7 @@ unittest {
     assert(equal(words2, ["this", "is", "just", "a", "test.", "I", "mean,", "I", "have", "no", "idea", "if", "this", "will", "work."][]));
 
     auto r1 = [1,2,3,4];
-    auto f = flatMap!"std.range.repeat(a,a)"(r1);
+    auto f = flatMap!" std.range.repeat(a,a)"(r1);
     assert(equal(f, [1,2,2,3,3,3,4,4,4,4][]));
 
 }
@@ -1810,8 +1810,7 @@ auto primesAfter3 = unfold!nextPrime(seed);
 assert(equal(take(10, primesAfter3), [5,7,11,13,17,19,23,29,31,37][]));
 ----
 
-Another example, to be compared to reduceR example: calculating the
-<a href = "http://en.wikipedia.org/wiki/Continued_fraction">continued fraction</a> development
+Another example, to be compared to reduceR example: calculating the development
 of a real.
 
 Example:
@@ -1835,28 +1834,33 @@ This example has a problem: it doesn't stop. But a number can have a finite cont
 
 See_Also: unfold2, reduce, reduceR, iterate, scan, scanR, recurrence, sequence
 */
+
 struct Unfold(alias fun, T...)
 {
     alias naryFun!fun nfun;
+    /*
     static if (__traits(compiles, nfun!T)) // Can I instantiate nfun!T?
         alias nfun!T infun;  // instantiates n-fun.
     else
         alias nfun infun;    // It's a function, do nothing.
+    */
 
-    alias ReturnType!infun Tup; // fun must return a Tuple!(FrontValue, T...)
+    //alias ReturnType!infun Tup; // fun must return a Tuple!(FrontValue, T...)
+    alias typeof(nfun(T.init)) Tup;
     Tup _state;
 
-    this(Tup.Types[1..$] initialParameters) { _state = infun(initialParameters);}
+    this(Tup.Types[1..$] initialParameters) { _state = nfun(initialParameters);}
     enum bool empty = false;
     Tup.Types[0] front() { return _state.field[0];}
     @property Unfold save() { return this;}
-    void popFront() { _state = infun(_state.field[1..$]);}
+    void popFront() { _state = nfun(_state.field[1..$]);}
 }
 
 /// ditto
 Unfold!(fun,T) unfold(alias fun, T...)(T initialParameters) {
     return Unfold!(fun,T)(initialParameters);
 }
+
 
 Tuple!(ulong, ulong[]) nextPrime(ulong[] primeList) { // Given a list of primes, find the next prime number
     ulong value = primeList.back + 2; // This could be done better with a wheel

@@ -66,11 +66,11 @@ assert(dranges.functional.arity!foov == 1);
 See_Also: $(M dranges.templates.TemplateFunArity).
 */
 
-template arity(alias fun) if (isFunction!fun) {
+template arity(alias fun) if (is(typeof(ParameterTypeTuple!fun.init))) {
     enum size_t arity = ParameterTypeTuple!(fun).length;
 }
 
-template arity(string fun)
+template arity(alias fun) if(is(typeof(fun) == string))
 {
     alias aritySImpl!(" " ~ fun ~ " ",0).result arity;
 }
@@ -106,6 +106,7 @@ unittest
     assert(dranges.functional.arity!"a+b" == 2);
     assert(dranges.functional.arity!"z + b" == 26);
 }
+
 
 /// Given a bunch of functions names, gives the typetuple of their return types. Used by $(M juxtapose).
 template ReturnTypes(Funs...)
@@ -1519,36 +1520,9 @@ alias naryFun!bar nbar;             // 0-arg function test
 assert(nbar == 1);
 ----
 */
-/*
-template naryFun(string fun, uint Nparam)
-{
-    alias naryFunImpl!(fun, Nparam).result naryFun;
-}
-/// ditto
-template naryFun(string fun)
-{
-    alias naryFunImpl!(fun, dranges.functional.arity!fun).result naryFun;
-}*/
-/*
-template naryFun(string fun, uint Nparam){
-    auto naryFun(T...)(T args)if(T.length == Nparam)
-    {
-        mixin(createAlias());
-        return mixin(fun);
-    }
-    
-    import std.conv : to;
-    
-    string createAlias(){
-        string dst;
-        foreach(i; 0..Nparam)
-            dst ~= "alias args[" ~ to!string(i) ~ "] " ~ cast(immutable(char))(i + 'a') ~ ";\n";
-        return dst;
-    }
-}*/
 
-template naryFun(string fun){
-    auto naryFun(T...)(T args)
+template naryFun(alias fun) if(is(typeof(fun) == string)){
+    auto ref naryFun(T...)(auto ref T args)
     {
         static assert(T.length <= 26);
         mixin(createAlias(T.length));
@@ -1565,53 +1539,7 @@ template naryFun(string fun){
     }
 }
 
-// Works OK, but only at runtime. I need to code this for compile-time.
-// OK, done.
-// may 2010: CTFE got better with recent DMD version. I should give it a try again.
-/*
-size_t arityHeuristics(string s) {
-    auto padded = " " ~ s ~ " ";
-    char[] paddedchars = cast(char[])padded; // To get rid of those pesky immutable(char)
-    bool isaz(char c) { return isOneOf!lowercase(c);} // lowercase is defined in std.string
-    bool isazAZ(char c) { return isOneOf!letters(c);} // letters is defined in std.string
-    bool isOneChar(char a, char b, char c) { return !isazAZ(a) && isaz(b) && !isazAZ(c);}
-    size_t charArity(char c) { return to!int(c)-96;} // 1 for 'a', 2 for 'b'
-    size_t loneIndex(char a, char b, char c) { return isOneChar(a,b,c) ? charArity(b) : 0;}
-    auto loneIndices = nMap!loneIndex(paddedchars);
-    return reduce!max(loneIndices);
-}
-*/
-/*
-template naryFunImpl(alias fun, uint Nparam) if (is(typeof(fun) : string))
-{
-    pragma(msg, Nparam.stringof);
-    static if (Nparam > 0)
-    {
-        enum string paramTypeList = Loop!(0, Nparam, PTL);
-        enum string paramNameList = Loop!(0, Nparam, PNL);
-        enum string bodyNameList  = Loop!(0, Nparam, BNL);
-        enum string aliasList     = Loop!(0, Nparam, AL);
-        enum string code = "typeof({" ~ paramNameList ~ " return (" ~ fun ~ ");}()) result(" ~ paramTypeList ~ ")(" ~ bodyNameList ~ ") { " ~ aliasList ~ " return (" ~ fun ~ ");}";
-    }
-    else
-    {
-        enum string code = "typeof((){return " ~ fun ~ ";}()) result() {return " ~fun ~ ";}";
-    }
-
-    mixin(code);
-}*/
-
-/// ditto
-template naryFun(alias fun, uint Nparam) if (!is(typeof(fun): string))// && (dranges.functional.arity!(fun) == Nparam))
-{
-    static if (is(fun == struct) || is(fun == class)) // class or struct constructor
-        alias construct!fun naryFun;
-    else
-        alias fun naryFun;
-}
-
-/// ditto
-template naryFun(alias fun) if (!is(typeof(fun): string))
+template naryFun(alias fun) if(!is(typeof(fun) == string))
 {
     alias fun naryFun;
 }
