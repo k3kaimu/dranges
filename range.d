@@ -884,10 +884,10 @@ struct HeadsStruct(R) if (isForwardRange!R && !hasLength!R)
     R _range;
     size_t n;
     this(R range) { _range = range;}
-    bool empty() {
+    @property bool empty() {
         return (n>0 && drop(n-1,_range).empty && drop(n,_range).empty);
     }
-    Take!R front() { return take(_range, n);}
+    @property Take!R front() { return take(_range, n);}
     @property HeadsStruct save() { return this;}
     void popFront() {n++;}
 }
@@ -1749,7 +1749,7 @@ struct Transverse(R...) if (allSatisfy!(isForwardRange,R) && CompatibleRanges!R)
         }
     }
 
-    bool empty() {
+    @property bool empty() {
         return willBeEmpty && globalFront.empty;
     }
 
@@ -1763,7 +1763,7 @@ struct Transverse(R...) if (allSatisfy!(isForwardRange,R) && CompatibleRanges!R)
         }
     }
 
-    ET front() {
+    @property ET front() {
         return globalFront.front;
     }
 }
@@ -1957,7 +1957,7 @@ if(isInputRange!(Unqual!Range))
       
       static if(hasSlicing!R)
       {
-        @property Segment opSlice()
+        Segment opSlice()
         {
           static if(isForwardRange!R)
             return save;
@@ -1966,7 +1966,7 @@ if(isInputRange!(Unqual!Range))
         }
 
 
-        @property auto opSlice(size_t i, size_t j)
+        auto opSlice(size_t i, size_t j)
         {
             return segment!1(_range[i .. j]);
         }
@@ -1985,7 +1985,7 @@ if(isInputRange!(Unqual!Range))
         }
       
       static if(isRandomAccessRange!R)
-        @property Tuple!E opIndex(size_t i)
+        Tuple!E opIndex(size_t i)
         {
             return tuple(_range[i]);
         }
@@ -2126,7 +2126,7 @@ if (isInputRange!(Unqual!Range)
 
 
       static if(isForwardRange!R) {
-        Segment save()
+        @property Segment save()
         {
             Segment dst = this;
             dst._range = dst._range.save;
@@ -2154,6 +2154,8 @@ if (isInputRange!(Unqual!Range)
         {
           return _range.length + !this.empty;
         }
+
+        alias length opDollar;
       }
 
       static if(hasSlicing!R)
@@ -2184,10 +2186,11 @@ unittest
     {
         int _front, _end;
         @property int front(){return _front;}
-        @property void popFront(){_front += 1;}
+        void popFront(){_front += 1;}
         @property bool empty(){return _front == _end;}
         @property TRange save(){return this;}
         @property size_t length(){return _end - _front;}
+        alias length opDollar;
     }
 
     auto tr = TRange(0, 5);
@@ -2230,10 +2233,11 @@ unittest
     {
         int _front, _end;
         @property int front(){return _front;}
-        @property void popFront(){_front += 1;}
+        void popFront(){_front += 1;}
         @property bool empty(){return _front == _end;}
         @property TRange save(){return this;}
         @property size_t length(){return _end - _front;}
+        alias length opDollar;
     }
 
     auto tr = TRange(0, 5);
@@ -2275,6 +2279,7 @@ unittest
         void popFront(){a.popFront;}
         @property TRange save(){return TRange(a.save);}
         @property size_t length(){return a.length;}
+        alias length opDollar;
         TRange opSlice(size_t i, size_t j){return TRange(a[i..j]);}
     }
 
@@ -2401,7 +2406,7 @@ if(isRandomAccessRange!(Unqual!Range)
         }
         
         
-        @property Segment save() const
+        @property Segment save()
         {
             Segment dst = cast(Segment)this;
             dst._range = dst._range.save;
@@ -2420,13 +2425,13 @@ if(isRandomAccessRange!(Unqual!Range)
         alias length opDollar;
       
 
-        @property auto opSlice() const
+        auto opSlice()
         {
             return save;
         }
 
 
-        @property Segment opSlice(size_t i, size_t j) const
+        Segment opSlice(size_t i, size_t j)
         {
             Segment dst = this.save;
             dst._fidx += i;
@@ -2437,13 +2442,13 @@ if(isRandomAccessRange!(Unqual!Range)
         }
       
 
-        @property Tuple!(TypeNuple!(E, N)) front() const
+        @property Tuple!(TypeNuple!(E, N)) front()
         {
             return (cast(typeof(return)[])(cast(ubyte[])_front))[0];
         }
 
 
-        @property Tuple!(TypeNuple!(E, N)) back() const
+        @property Tuple!(TypeNuple!(E, N)) back()
         {
             return (cast(typeof(return)[])(cast(ubyte[])_back))[0];
         }
@@ -2860,14 +2865,14 @@ if(isBidirectionalRange!(Unqual!Range)
 
       static if(hasSlicing!R)
       {
-        @property Segment opSlice()
+        Segment opSlice()
         {
             return save;
         }
 
 
         static if(assE || isRandomAccessRange!R)
-          @property auto opSlice(size_t i, size_t j)
+          auto opSlice(size_t i, size_t j)
           {
               return segment!N(_assignRange[i..j + (N-1)]);
           }
@@ -2951,6 +2956,7 @@ unittest
         @property int back(){return a.back();}
         @property TRange save(){return TRange(a.save);}
         @property size_t length(){return a.length;}
+        alias length opDollar;
     }
 
 
@@ -3003,6 +3009,7 @@ unittest
         @property TRange save(){return TRange(a.save);}
         @property size_t length(){return a.length;}
         TRange opSlice(size_t i, size_t j){return TRange(a[i..j]);}
+        alias length opDollar;
     }
 
 
@@ -3076,6 +3083,7 @@ unittest
         @property TRange save(){return TRange(a.save);}
         @property size_t length(){return a.length;}
         TRange opSlice(size_t i, size_t j){return TRange(a[i..j]);}
+        alias length opDollar;
     }
 
 
@@ -3391,11 +3399,11 @@ struct Concat(R) if (isRangeOfRanges!R)
         }
     }
 
-    bool empty() {
+    @property bool empty() {
         return _range.empty;
     }
 
-    ET1 front() {
+    @property ET1 front() {
         return _subrange.front;
     }
 
@@ -3633,22 +3641,22 @@ struct Numbers {
     this(int from, int to) { _num = from; _max = to; _step = 1;}
     this(int from, int to, int step) { _num = from; _max = to; _step = step;}
 
-    @property bool empty() { return (_step > 0) ? _num >= _max : _num <= _max;}
-    @property int front() {return _num;}
-    @property Numbers save() { return this;}
+    @property bool empty() const { return (_step > 0) ? _num >= _max : _num <= _max;}
+    @property int front() const {return _num;}
+    @property Numbers save() const { return this;}
     void popFront() { _num = _num + _step;}
-    int back() { return _max-1;}
+    @property int back() const { return _max-1;}
     void popBack()  { _max = _max - _step;}
 
-    int opIndex(size_t index) {
+    int opIndex(size_t index) const {
         if ((_step > 0) && (index*_step + _num >= _max) || (_step < 0) && (index*_step + _num <= _max))
             throw new Exception("Numbers.opIndex: Out of bound with index: " ~ to!string(index));
         return cast(int)(index*_step + _num);
     }
 
-    Numbers opSlice() { return this;}
+    Numbers opSlice() const { return this;}
 
-    Numbers opSlice(size_t index1, size_t index2) {
+    Numbers opSlice(size_t index1, size_t index2) const {
         if ((_step > 0) && (index1*_step + _num > _max) || (_step < 0) && (index1*_step + _num <= _max))
             throw new Exception("Numbers.opSlice: first index out of bound " ~ to!string(index1*_step) ~ " + " ~ to!string(_num) ~ " >= " ~ to!string(_max));
         if ((_step > 0) && (index2*_step + _num > _max) || (_step < 0) && (index2*_step + _num <= _max))
@@ -3656,7 +3664,8 @@ struct Numbers {
         return Numbers(to!int(index1*_step + _num), to!int(index2*_step + _num));
     }
 
-    @property size_t length() { return (this.empty ? 0 : (cast(size_t)((_max-_num)/_step)) + !!((_max - _num)%_step));}
+    @property size_t length() const { return (this.empty ? 0 : (cast(size_t)((_max-_num)/_step)) + !!((_max - _num)%_step));}
+    alias length opDollar;
 }
 
 /// ditto
@@ -3716,25 +3725,25 @@ struct Numberz(T) {
     this(T from, T to) { _num = from; _max = to; _step = 1;}
     this(T from, T to, T step) { _num = from; _max = to; _step = step;}
 
-    bool empty() { return (_step > 0) ? _num >= _max : _num <= _max;}
-    T front() {return _num;}
-    @property Numberz save() { return this;}
+    @property bool empty() const { return (_step > 0) ? _num >= _max : _num <= _max;}
+    @property T front() const {return _num;}
+    @property Numberz save() const { return this;}
     void popFront() { _num = _num + _step;}
-    T back() { return _max - _step;}
+    @property T back() const { return _max - _step;}
     void popBack()  { _max = _max - _step;}
 
     static if (!is(T == size_t)) T opIndex(size_t index) { T i = index; return opIndex(i);}
 
-    T opIndex(T index) {
+    T opIndex(T index) const {
         T i = index*_step + _num;
         if ((i < 0) || (_step > 0) && (i >= _max) || (_step < 0) && (i <= _max))
             throw new Exception("Numberz!" ~ T.stringof ~ ".opIndex: Out of bound with index: " ~ to!string(index));
         return i;
     }
 
-    Numberz!T opSlice() { return this;}
+    Numberz!T opSlice() const { return this;}
 
-    Numberz!T opSlice(T index1, T index2) {
+    Numberz!T opSlice(T index1, T index2) const {
         T i1 = index1*_step + _num;
         T i2 = index2*_step + _num;
         if ((i1 < 0) || (_step > 0) && (i1 > _max) || (_step < 0) && (i1 < _max))
@@ -3744,7 +3753,8 @@ struct Numberz(T) {
         return Numberz!T(i1, i2, _step);
     }
 
-    T length() { return (empty ? T.init : (_max-_num)/_step);}
+    T length() const { return (empty ? T.init : (_max-_num)/_step);}
+    alias length opDollar;
 }
 
 /// ditto
@@ -3779,8 +3789,8 @@ struct NaturalNumbers {
     long _num = 0;
     bool _positive = true;
     enum bool empty = false;
-    long front() { return _num;}
-    @property NaturalNumbers save() { return this;}
+    @property long front() const { return _num;}
+    @property NaturalNumbers save() const { return this;}
     void popFront() {
         if (_num == 0) {
             _num = 1;
@@ -3826,17 +3836,17 @@ assert(hasSlicing!(typeof(e)));
 struct EmptyRange(T) {
     enum bool empty = true;
     enum size_t length = 0;
-    @property size_t opDollar(){return 0;}
-    @property EmptyRange save() { return this;}
-    void popFront() {throw new Exception("EmptyRange is empty: do not call popFront");}
-    @property T front() {throw new Exception("EmptyRange is empty: do not call front"); return T.init;}
-    void popBack() {throw new Exception("EmptyRange is empty: do not call popBack");}
-    @property T back() {throw new Exception("EmptyRange is empty: do not call back"); return T.init;}
-    T opIndex(size_t index) {throw new Exception("EmptyRange is empty: do not call opIndex"); return T.init;}
-    EmptyRange!T opSlice(size_t index1, size_t index2) {return this;}
+    @property size_t opDollar() const {return 0;}
+    @property EmptyRange save() const { return this;}
+    void popFront() const {throw new Exception("EmptyRange is empty: do not call popFront");}
+    @property T front() const {throw new Exception("EmptyRange is empty: do not call front"); return T.init;}
+    void popBack() const {throw new Exception("EmptyRange is empty: do not call popBack");}
+    @property T back() const {throw new Exception("EmptyRange is empty: do not call back"); return T.init;}
+    T opIndex(size_t index) const {throw new Exception("EmptyRange is empty: do not call opIndex"); return T.init;}
+    EmptyRange!T opSlice(size_t index1, size_t index2) const {return this;}
 
-    R opCat(R)(R range) if (isForwardRange!R && is(ElementType!R == T)) { return range;}
-    R opCat_r(R)(R range) if (isForwardRange!R && is(ElementType!R == T)) { return range;}
+    R opCat(R)(R range)if (isForwardRange!R && is(ElementType!R == T)){ return range;}
+    R opCat_r(R)(R range)if (isForwardRange!R && is(ElementType!R == T)){ return range;}
 }
 
 /// ditto
@@ -3861,6 +3871,8 @@ unittest
     static assert(isRandomAccessRange!(typeof(e)));
     static assert(hasLength!(typeof(e)));
     static assert(hasSlicing!(typeof(e)));
+
+    auto arremp = emptyRange!(int[]);
 }
 
 /**
@@ -3878,16 +3890,17 @@ struct Once(T) {
     T[] elem;
     this(T value) {elem = [value][];}
 
-    bool empty() { return elem.empty;}
-    T front() { return elem.front;}
+    @property bool empty() const { return elem.empty;}
+    @property T front() { return elem.front;}
     @property Once save() { return this;}
     void popFront() { elem.popFront;}
-    T back() { return elem.front;}
+    @property T back() { return elem.front;}
     void popBack() { elem.popFront;}
-    ulong length() { return elem.length;}
+    @property size_t length() const { return elem.length;}
+    alias length opDollar;
     T opIndex(size_t index) { assert(index == 0); return elem[0];}
     void opIndexAssign(T value, size_t index) { assert(index == 0); elem[0] = value;}
-    Once!T opSlice() { return this;}
+    Once opSlice() { return this;}
 /+    Once!T opSlice(ulong i1, ulong i2) // strange, I had to put ulong to satisfy std.range.ChainImpl
     {
         assert(i1 <= this.length()); // It was originally == 0, but [1..1] seems authorized for arrays. I thought it wasn"t.
@@ -3932,7 +3945,7 @@ struct Pi
 {
     BigInt q,r,t,i,u,y;
     enum bool empty = false;
-    @property int front() { return to!int(y.toInt());}
+    @property int front() const { return to!int(y.toInt());}
     @property Pi save() { return this;}
     void popFront()
     {
@@ -3972,10 +3985,10 @@ struct InfiniteBiDir(R1, R2) if (isForwardRange!R1 && isForwardRange!R1
 
     enum bool empty = false;
 
-    ET front() { return _r1.front;}
+    @property ET front() { return _r1.front;}
     @property InfiniteBiDir save() { return this;}
     void popFront() { _r1.popFront;}
-    ET back() { return _r2.front;}
+    @property ET back() { return _r2.front;}
     void popBack() { _r2.popFront;}
 
     static if (isRandomAccessRange!R1 && isRandomAccessRange!R2)
@@ -4030,7 +4043,7 @@ struct ReplicateRange(R) if (isForwardRange!R) {
         _times = n;
     }
 
-    bool empty() { return (_times == 0 || _range.empty);}
+    @property bool empty() { return (_times == 0 || _range.empty);}
 
     @property ReplicateRange save() { return this;}
 
@@ -4047,7 +4060,7 @@ struct ReplicateRange(R) if (isForwardRange!R) {
         }
     }
 
-    ElementType!R front() { return _copy.front;}
+    @property ElementType!R front() { return _copy.front;}
 
     static if (isBidirectionalRange!R) {
         void popBack() {
@@ -4072,7 +4085,7 @@ struct ReplicateRange(R) if (isForwardRange!R) {
     }
 
     static if (hasLength!R) {
-        size_t length() {
+        @property size_t length() {
             switch (_times) {
                 case 0:
                     return 0;
@@ -4082,6 +4095,7 @@ struct ReplicateRange(R) if (isForwardRange!R) {
                     return _range.length * _times + (_copy.length - _range.length) + (_backCopy.length - _range.length);
             }
         }
+        alias length opDollar;
     }
 
     static if (isRandomAccessRange!R && hasLength!R) { // and hasLength...
@@ -4161,11 +4175,11 @@ struct Stutter(R) if (isForwardRange!R){
         _backCount = times;
     }
 
-    bool hasOneElement() {
+    @property bool hasOneElement() {
         return walkLength(_range, 2) == 1;
     }
 
-    bool empty() {
+    @property bool empty() {
         return (_range.empty || _frontCount == 0 || _backCount == 0); // If _count is zero at creation -> empty range.
                                                       // Else it will become zero once _range is empty.
     }
@@ -4184,16 +4198,18 @@ struct Stutter(R) if (isForwardRange!R){
         }
     }
 
-    ElementType!R front() {
+    @property ElementType!R front() {
         return _range.front;
     }
 
     static if (hasLength!R) {
-        size_t length() {
+        @property size_t length() {
             return   _range.length * _times
                    - (_times - _frontCount)
                    - (_times - _backCount);
         }
+
+        alias length opDollar;
     }
 
     static if (isBidirectionalRange!R) {
@@ -4209,7 +4225,7 @@ struct Stutter(R) if (isForwardRange!R){
             }
         }
 
-        ElementType!R back() {
+        @property ElementType!R back() {
             return _range.back;
         }
     }
@@ -4291,11 +4307,11 @@ struct Extremities(R) if (isBidirectionalRange!R) {
         _state = 0;
     }
 
-    bool empty() {
+    @property bool empty() {
         return _range.empty;
     }
 
-    ElementType!R front() {
+    @property ElementType!R front() {
         return _state == 0 ? _range.front : _range.back;
     }
 
@@ -4312,9 +4328,11 @@ struct Extremities(R) if (isBidirectionalRange!R) {
     }
 
     static if (hasLength!R) {
-        size_t length() {
+        @property size_t length() {
             return _range.length;
         }
+
+        alias length opDollar;
     }
 }
 
@@ -4405,9 +4423,9 @@ struct Without(R1, R2)
         }
     }
 
-    bool empty() { return _range1.empty;}
+    @property bool empty() { return _range1.empty;}
 
-    ElementType!R1 front() { return _range1.front;}
+    @property ElementType!R1 front() { return _range1.front;}
 
     @property Without save() { return this;}
 
@@ -4460,11 +4478,11 @@ struct AsSet(R) if (isForwardRange!R) {
     bool[ElementType!R] elements;
 
     this(R range) { _range = range;}
-    bool empty() {return _range.empty;}
+    @property bool empty() {return _range.empty;}
     @property AsSet save() { return this;}
     void popFront() { while(!_range.empty && (_range.front in elements) ) _range.popFront;}
 
-    ElementType!R front() {
+    @property ElementType!R front() {
         auto f = _range.front;
         elements[f] = true;
         return f;
@@ -4478,14 +4496,14 @@ struct AsSet(R : Cycle!U, U)
     U _range;
 
     this(R range) { _range = range._original;}
-    bool empty() {return _range.empty;}
+    @property bool empty() {return _range.empty;}
     @property AsSet save() { return this;}
     void popFront() {
         _range.popFront;
         while(!_range.empty && (_range.front in elements)) _range.popFront;
     }
 
-    ElementType!R front() {
+    @property ElementType!R front() {
         auto f = _range.front;
         elements[f] = true;
         return f;
@@ -4498,10 +4516,10 @@ struct AsSet(R : Repeat!U, U)
     U[] _range;
 
     this(R range) { if (!range.empty) _range = [range.front][];} // or else range is an empty Repeat. I don"t think that's even possible.
-    bool empty() {return _range.empty;}
+    @property bool empty() {return _range.empty;}
     @property AsSet save() { return this;}
     void popFront() { _range.popFront;}
-    ElementType!R front() { return _range.front;}
+    @property ElementType!R front() { return _range.front;}
 }
 
 /// ditto
@@ -4581,17 +4599,19 @@ struct Cache(R) if (isForwardRange!R)
             if (!_input.empty) _back = _input.back;
     }
 
-    bool empty() { return _input.empty;}
-    ElementType!R front() { return _front;}
+    @property bool empty() { return _input.empty;}
+    @property ElementType!R front() { return _front;}
     @property Cache save() { return this;}
     void popFront() { _input.popFront; if (!_input.empty) _front = _input.front;}
     static if (isBidirectionalRange!R) {
-        ElementType!R back() { return _back;}
+        @property ElementType!R back() { return _back;}
         void popBack() { _input.popBack; if (!_input.empty) _back = _input.back;}
     }
 
-    static if (hasLength!R)
+    static if (hasLength!R){
         size_t length() { return _input.length;}
+        alias length opDollar;
+    }
 }
 
 /// ditto
@@ -4718,7 +4738,7 @@ r2 ~ r1; // No, r2 must define opCat. A templated opCat_r does not work if r1 an
 Note: it detects Chain!R and reacts accordingly. That is, it does not build Chain!(R, Chain!(U)), but Chain!(R,U).
 Note: to be really interesting, it needs some modifications of std.range.Chain, to give it opCat capabilities.
 */
-template Chainable() /+if (isInputRange!T)+/ {
+mixin template Chainable() /+if (isInputRange!T)+/ {
     alias ElementType!(typeof(this)) ETthis;
 
     // Concat to the right with another range.
@@ -4789,9 +4809,9 @@ struct Store(R) if (isInputRange!R)
     static if (isInfinite!R)
         enum bool empty = false;
     else
-        bool empty() { return _range.empty && (index == store.length && backIndex == backStore.length);}
+        @property bool empty() { return _range.empty && (index == store.length && backIndex == backStore.length);}
 
-    ElementType!R front()
+    @property ElementType!R front()
     {
         if (usingStore)
         {
@@ -4838,13 +4858,15 @@ struct Store(R) if (isInputRange!R)
     void advance() { backIndex--;} // backRetreat?
     bool exhausted() { return _range.empty;}
 
-    static if (hasLength!R)
-        size_t length() { return _range.length + (store.length - index) + (backStore.length - backIndex);}
+    static if (hasLength!R){
+        @property size_t length() { return _range.length + (store.length - index) + (backStore.length - backIndex);}
+        alias length opDollar;
+    }
 
     static if (isBidirectionalRange!R) {
 
 // Mmm, what if I call back, popBack and back again? Same value?
-        ElementType!R back() {
+        @property ElementType!R back() {
             if (usingBackStore)
             {
                 return backStore[backIndex];
@@ -5483,7 +5505,7 @@ unittest{
 }
 
 
-/+
+
 /**
 "yield" as in Python, Ruby or C#.
 
@@ -5512,6 +5534,21 @@ auto r2 = {
 }();
 
 assert(equal(r2, filter!"a&1"(iota(100))));
+
+auto r3 = {
+    int sum;
+
+    void func(Yield!int yield){
+        while(1){
+            sum += yield.value * yield.next;
+        }
+    }
+
+    return tuple(yieldRange(&func), () => sum);
+}();
+
+put(r3[0], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+assert(r3[1]() == (0*1 + 1*2 + 2*3 + 3*4 + 4*5 + 5*6 + 6*7 + 7*8 + 8*9 + 9*10));
 ---
 
 Authors: Kazuki Komatsu(k3_kaimu)
@@ -5539,8 +5576,14 @@ public:
 
 
     @property
-    auto ref peek(){
+    ref T next(){
         this.yield();
+        return _value;
+    }
+
+
+    @property
+    ref T value(){
         return _value;
     }
 }
@@ -5580,7 +5623,7 @@ template yieldRange(T){
 
 
         @property
-        auto ref front(){
+        ref T front(){
             return _yield._value;
         }
 
@@ -5628,13 +5671,13 @@ unittest{
 
         void func(Yield!int yield){
             while(1){
-                sum += yield.peek;
+                sum += yield.value * yield.next;
             }
         }
 
         return tuple(yieldRange(&func), () => sum);
-    };
+    }();
 
     put(r3[0], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    assert(r3[1] ==55);
-}+/
+    assert(r3[1]() == (0*1 + 1*2 + 2*3 + 3*4 + 4*5 + 5*6 + 6*7 + 7*8 + 8*9 + 9*10));
+}

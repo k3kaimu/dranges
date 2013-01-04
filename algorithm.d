@@ -1258,7 +1258,7 @@ struct Iterate(alias fun, S) {
 
     this(S seed) { _seed = seed;}
     enum bool empty = false; // Infinite range
-    S front() { return _seed;}
+    @property S front() { return _seed;}
     @property Iterate save() { return this;}
     void popFront() { _seed = unaryFun!fun(_seed);}
     S opIndex(size_t n) {
@@ -1363,10 +1363,10 @@ struct Scan(alias fun, S, R) if (/*isForwardRange*/isInputRange!R)// && Compatib
     }
 
     
-    bool empty() {return _range.empty && done;}
+    @property bool empty() {return _range.empty && done;}
 
     
-    S front() { return _result;}
+    @property S front() { return _result;}
     
     
   static if(isForwardRange!R)
@@ -1461,9 +1461,9 @@ struct Scan2(alias fun, S, R) if (isForwardRange!R)// && CompatibilityFuncArgs!(
         _result = seed;
     }
 
-    bool empty() {return _range.empty && done;}
+    @property bool empty() {return _range.empty && done;}
 
-    Tuple!(S,R) front() { return tuple(_result, _range);}
+    @property Tuple!(S,R) front() { return tuple(_result, _range);}
 
     @property Scan2 save() { return this;}
 
@@ -1535,7 +1535,7 @@ struct ScanR(alias fun, S, R) if (isBidirectionalRange!R)// && CompatibilityFunc
         if (range.empty) done = true;
     }
 
-    bool empty() {return _range.empty && done;}
+    @property bool empty() {return _range.empty && done;}
 
     S front() { return _result;}
 
@@ -1609,9 +1609,9 @@ struct TScan(alias fun, S, R...) if (allSatisfy!(isForwardRange,R))
         _result = seed;
     }
 
-    bool empty() {return _ranges.empty && done;}
+    @property bool empty() {return _ranges.empty && done;}
 
-    S front() { return _result;}
+    @property S front() { return _result;}
 
     @property TScan save() { return this;}
 
@@ -1662,9 +1662,9 @@ struct TScanR(alias fun, S, R...) if (allSatisfy!(isBidirectionalRange,R))
         _result = seed;
     }
 
-    bool empty() {return _ranges.empty && done;}
+    @property bool empty() {return _ranges.empty && done;}
 
-    S front() { return _result;}
+    @property S front() { return _result;}
 
     @property TScanR save() { return this;}
 
@@ -1851,7 +1851,7 @@ struct Unfold(alias fun, T...)
 
     this(Tup.Types[1..$] initialParameters) { _state = nfun(initialParameters);}
     enum bool empty = false;
-    Tup.Types[0] front() { return _state.field[0];}
+    @property Tup.Types[0] front() { return _state.field[0];}
     @property Unfold save() { return this;}
     void popFront() { _state = nfun(_state.field[1..$]);}
 }
@@ -1993,8 +1993,8 @@ struct Unfold2(alias fun, alias pred, T...)
     Tup _state;
 
     this(Tup.Types[1..$] initialParameters) { _state = infun(initialParameters);}
-    bool empty() { return Prepare!(pred, Tup.Types)(_state);}
-    Tup.Types[0] front() { return _state.field[0];}
+    @property bool empty() { return Prepare!(pred, Tup.Types)(_state);}
+    @property Tup.Types[0] front() { return _state.field[0];}
     @property Unfold2 save() { return this;}
     void popFront() { _state = infun(_state.field[1..$]);}
 }
@@ -2343,8 +2343,8 @@ struct Merge(alias pred, R...) if (allSatisfy!(isForwardRange, R) && CompatibleR
     }
 
     this(R ranges) { _ranges = ranges; findSmallest();}
-    bool empty() { return isEmpty;}
-    CommonElementType!R front() { return _front;}
+    @property bool empty() { return isEmpty;}
+    @property CommonElementType!R front() { return _front;}
     @property Merge save() { return this;}
     void popFront() { findSmallest();}
 }
@@ -2672,7 +2672,7 @@ struct Group(R) if (isForwardRange!R) {
     alias ElementType!R ET;
     ET[] groupFront, groupBack; // groupBack will be used only for bidir range
 
-    ET[] generateFront(T)(T r) if (isInputRange!T) {
+    @property ET[] generateFront(T)(T r) if (isInputRange!T) {
         ET[] f = [r.front];
         r.popFront;
         while(!r.empty && r.front == f[0]) {
@@ -2690,8 +2690,8 @@ struct Group(R) if (isForwardRange!R) {
         }
     }
 
-    bool empty() { return _range.empty;}
-    ET[] front() { return groupFront;}
+    @property bool empty() { return _range.empty;}
+    @property ET[] front() { return groupFront;}
     @property Group save() { return this;}
     void popFront() {
         auto f = _range.front;
@@ -2702,7 +2702,7 @@ struct Group(R) if (isForwardRange!R) {
     }
 
     static if (isBidirectionalRange!R) {
-        ET[] back() { return groupBack;}
+        @property ET[] back() { return groupBack;}
         void popBack() {
             auto b = _range.back;
             while(!_range.empty && _range.back == b) {
@@ -2854,9 +2854,9 @@ struct Rotate(R) if (isForwardRange!R && !isBidirectionalRange!R)
     static if (isInfinite!R)
         enum bool empty = false;
     else
-        bool empty() { return _r.empty && _end.empty; }
+        @property bool empty() { return _r.empty && _end.empty; }
 
-    ElementType!R front() { return (_r.empty) ? _end.front : _r.front;}
+    @property ElementType!R front() { return (_r.empty) ? _end.front : _r.front;}
 
     @property Rotate save() { return this;}
 
@@ -2917,9 +2917,9 @@ struct Rotate(R) if (isBidirectionalRange!R)
     static if (isInfinite!R) // bidir and infinite is possible, though quite uncommon.
         enum bool empty = false;
     else
-        bool empty() { return _r.empty && ((n>=0) ? _end.empty : _beginning.empty); }
+        @property bool empty() { return _r.empty && ((n>=0) ? _end.empty : _beginning.empty); }
 
-    ElementType!R front()
+    @property ElementType!R front()
     {
         if (n >=0)
         {
@@ -2959,7 +2959,7 @@ struct Rotate(R) if (isBidirectionalRange!R)
         }
     }
 
-    ElementType!R back()
+    @property ElementType!R back()
     {
         if (n >=0)
         {
@@ -3251,8 +3251,8 @@ struct ToIndex(R) if(isForwardRange!R)
         }
     }
 
-    bool empty() { return _range.empty;};
-    size_t front() { return indices[_range.front];}
+    @property bool empty() { return _range.empty;};
+    @property size_t front() { return indices[_range.front];}
     @property ToIndex save() { return this;}
     void popFront() {
         _range.popFront;
@@ -3421,6 +3421,7 @@ struct Combinations(R...) if (allSatisfy!(isForwardRange, R)) {
         }
     }
 
+    @property
     bool empty() { // We must check all of them because some may be empty at creation!
         return someEmpty(_currentRanges);
     }
@@ -3440,6 +3441,7 @@ struct Combinations(R...) if (allSatisfy!(isForwardRange, R)) {
         pops++; // For length
     }
 
+    @property
     FrontTuple front() {
         FrontTuple f;
         foreach(i, r; _currentRanges) {
@@ -3449,9 +3451,12 @@ struct Combinations(R...) if (allSatisfy!(isForwardRange, R)) {
     }
 
     static if (allSatisfy!(hasLength, R)) {
+        @property
         size_t length() {
             return _length-pops;
         }
+
+        alias length opDollar;
     }
 }
 
@@ -3646,7 +3651,7 @@ struct Permutations(R) {
         k = n;
     }
 
-    ElementType!R[] front() { return _perm;}
+    @property ElementType!R[] front() { return _perm;}
     bool empty() { return (n == 1 && k == 0 )|| (n>1 && k <=1);}
     @property Permutations save() { return this;}
     void popFront() {
@@ -3766,8 +3771,8 @@ struct ChooseIndex(uint repetition = withoutRepetition) {
         foreach(size_t i, ref elem; indice) elem = minIndex(i);
     }
 
-    bool empty() { return atMax;}
-    size_t[] front() { return indice;}
+    @property bool empty() { return atMax;}
+    @property size_t[] front() { return indice;}
     @property ChooseIndex save() { return this;}
 
     void popFront() {
@@ -3900,12 +3905,12 @@ struct Consumer(alias nextElement, alias isSafe, alias renewState, alias buildSt
     static if (isInfinite!R)
         enum bool empty = false;
     else
-        bool empty()
+        @property bool empty()
         {
             return _range.empty && flushed && flush.empty;
         }
 
-    Out front() { return currentElem;}
+    @property Out front() { return currentElem;}
 
     @property Consumer save() { return this;}
 
