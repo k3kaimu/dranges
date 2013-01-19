@@ -24,6 +24,8 @@ import dranges.functional,
        dranges.traits,
        dranges.typetuple;
 
+version(unittest) import std.stdio;
+
 /+
 ///
 template isInstanceOf(alias t, alias templ)
@@ -88,7 +90,10 @@ version( unittest ) {
 }
 
 unittest {
-   assert( staticSwitch!( foo, 1, 2 ).With( 2,3 ) == 6 );
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
+    assert( staticSwitch!( foo, 1, 2 ).With( 2,3 ) == 6 );
 }
 
 /**
@@ -235,6 +240,9 @@ version(unittest)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto c = cycle([1,2,3][]);
     assert(is(typeof(c) == Cycle!(int[]))); // A cycle around an array of int
     alias UnWrap!("Cycle", typeof(c)) InternalType;
@@ -422,6 +430,9 @@ auto wrapCode(alias code, size_t n = 1, T)(T value) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[] appendZero(int[] a) { return a ~ [0];}
     int[] r = [1,2,3];
     auto w = wrapCode!(appendZero, 3)(r);
@@ -883,6 +894,9 @@ template TransferParamsFrom(alias templ)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     alias TransferParamsTo!Repeat MkRepeat;
     alias MkRepeat.From!(Cycle!(int[])) R; // takes a Cycle!(Range), extracts Range, makes a Repeat from it.
     assert(is(R == Repeat!(int[]))); // R is a Repeat!(int[])
@@ -933,6 +947,9 @@ template SwitchOnType(alias value, Type : Default, alias Action) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int i; double d; string s;
     alias SwitchOnType!(i, int, "It's an int", double, "It's a double", Default, "It's something else") switchi;
     alias SwitchOnType!(d, int, "It's an int", double, "It's a double", Default, "It's something else") switchd;
@@ -967,6 +984,9 @@ template InlineTemplate(string args, string code, string file, size_t line)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    
     alias InlineTemplate!("T", q{T value;}, __FILE__, __LINE__) S;
     alias InlineTemplate!("T", q{struct IT{T value;}}, __FILE__, __LINE__) Struct;
 }

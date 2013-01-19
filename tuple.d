@@ -91,6 +91,9 @@ CommonType!R[] tupleToDynamicArray(R...)(Tuple!(R) t) if (!is(CommonType!R == vo
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple(1, 2.0, 10000000000);
     auto sa = tupleToStaticArray(t);
     auto da = tupleToDynamicArray(t);
@@ -137,6 +140,9 @@ Tuple!(TypeNuple!(T,n)) dynamicArrayToTuple(size_t n, T)(T[] arr) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[3] a = [1,2,3];
     auto t1 = staticArrayToTuple(a);
     assert(is(typeof(t1) == Tuple!(int,int,int)));
@@ -171,6 +177,9 @@ Tuple!(TypeNuple!(ElementType!R,upTo)) rangeToTuple(size_t upTo, R)(R range) if 
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r = [0,1,2,3,4,5];
     auto f = filter!isOdd(r);
     auto t = rangeToTuple!3(f);
@@ -218,6 +227,9 @@ bool empty(R...)(Tuple!R tup)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple('a',1, 3.1415);
     assert(front(t)  == 'a');
     assert(tail(t)   == tuple(1, 3.1415));
@@ -252,6 +264,9 @@ Tuple!(TypeTuple!(R[0..n],T,R[n..$])) insertAtTuple(size_t n, T, R...)(Tuple!R t
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple(1,'a',3.14);
     auto s0 = insertAtTuple!0(t, "qwer");
     auto s1 = insertAtTuple!1(t, "qwer");
@@ -296,6 +311,9 @@ template ShredType(alias array, R...) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple(1, 'a', 3.14);
 
     auto s1 = shredTuple!([0,2])(t);
@@ -343,6 +361,9 @@ Tuple!(RotateTypes!(n,R)) rotateTuple(int n, R...)(Tuple!R tup)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple(1, 'a', 3.14);
 
     auto r1 = rotateTuple!1(t);
@@ -378,6 +399,9 @@ Tuple!(ReverseTypes!R) reverseTuple(R...)(Tuple!R tup)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple(1,'a',3.14);
     auto r = reverseTuple(t);
     assert(r == tuple(3.14,'a',1));
@@ -403,6 +427,9 @@ Tuple!(T1.Types, T2.Types) stitchTuples(T1, T2)(T1 tup1, T2 tup2) if (is(T1.Type
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t1 = tuple(1, 'a', 3.14);
     auto t2 = tuple("abc", true);
     auto t3 = stitchTuples(t1,t2);
@@ -427,6 +454,9 @@ Tuple!(R, E) append(E, R...)(Tuple!R tup, E element)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple(1, 'a', 3.14);
     auto t2 = append(t, "abc");
     assert(is(typeof(t2) == Tuple!(int, char, double, string)));
@@ -450,6 +480,9 @@ Tuple!(E, R) prepend(E, R...)(E element, Tuple!R tup)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple(1, 'a', 3.14);
     auto t2 = prepend("abc", t);
     assert(is(typeof(t2) == Tuple!(string, int, char, double)));
@@ -490,6 +523,9 @@ Tuple!(SwapTypes!(i1,i2,R)) swapTuple(size_t i1, size_t i2, R...)(Tuple!R tup)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple(1, 'a', 3.14, "abc");
     auto ts1 = swapTuple!(1,3)(t);
     assert(ts1 == tuple(1, "abc", 3.14, 'a'));
@@ -533,6 +569,9 @@ Tuple!(FlattenTuple!T) flattenTuple(T...)(T tup)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    
     auto t0 = tuple(0);
     auto t1 = tuple("a", 3.14);
     auto t2 = tuple(t0, 100);

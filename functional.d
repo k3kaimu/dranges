@@ -87,6 +87,9 @@ template arity(alias templateFun, alias ParameterGenerator, size_t N = 0)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int foo0() { return 0;}
     int foo1(int a) { return a;}
     int foo2(int a, int b) { return a+b;}
@@ -191,6 +194,9 @@ template juxtapose(Funs...)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int foo(int i) { return i*i;}       // int -> int
     int bar() { return 0;}              // ()  -> int
     void baz(string s) {}               // string -> ()
@@ -259,6 +265,9 @@ FlipnR!fun flipn(alias fun)(size_t n)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto rr = [[0,1,2,3,4,5],[6,7,8,9], [10]];
 
     alias flipn!(std.range.take) takeN; // takeN is a higher-order function, waiting for a number of elements to take.
@@ -349,6 +358,9 @@ version(unittest)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int sub(int i, int j) { return i-j;}
     int one(int i) { return i;}
     int none() { return 0;}
@@ -370,7 +382,7 @@ unittest
     assert(fconj(1,2) == "21");
     assert(fconjAll(1,2,3,4) == "4321");
 }
-
+/+
 /**
 Takes a D function, and curries it (in the Haskell sense, not as Phobos' $(M std.functional._curry)): given
 a n-args function, it creates n 1-arg functions nested inside one another. When
@@ -443,15 +455,7 @@ struct CurriedFunction(alias fun, T...) /+if (T.length)+/
     static if (T.length)
         void initialize(T t) { _t = t;}
 
-    template OpCallType(U...)
-    {
-        static if (is (typeof(fun(Init!T, Init!U))))
-            alias typeof(fun(Init!T, Init!U)) OpCallType;
-        else
-            alias CurriedFunction!(fun, T, U) OpCallType;
-    }
-
-    OpCallType!U opCall(U...)(U u)
+    auto opCall(U...)(U u)
     {
         static if(is(typeof(fun(_t, u))))
             return fun(_t,u);
@@ -472,6 +476,9 @@ CurriedFunction!(fun, TypeTuple!()) curriedFunction(alias fun)()
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int add(int i, int j) { return i+j;}
     alias curry!add cadd; // cadd waits for an int, will return an int delegate(int)
     auto add3 = cadd(3); // add3 is a function that take an int and return this int + 3.
@@ -485,6 +492,7 @@ unittest
     auto f = filter!equals4([2,3,4,5,4,3,2,2,3,4]);
     assert(equal(f, [4,4,4]));
 }
++/
 
 struct InvertibleFun(A, B)
 {
@@ -513,15 +521,6 @@ InvertibleFun!(A,B) invertibleFun(A, B)(B delegate(A) fun, A delegate(B) funInv)
     return ifun;
 }
 
-struct Apply(T...)
-{
-    T value;
-
-    typeof(F.init(Init!T)) opCall(F)(F fun)
-    {
-        return fun(value);
-    }
-}
 
 /**
 Takes a value argument and creates a function (in fact, a struct with an opCall) that will accept any delegate
@@ -546,15 +545,27 @@ auto apply123 = apply(1, 2.30);
 assert(apply123(&g0) == 3.30);
 ----
 */
-Apply!T apply(T...)(T value)
-{
+struct Apply(T...){
+    T _v;
+
+    auto opCall(F)(F f){
+        return f(_v);
+    }
+}
+
+///ditto
+auto apply(T...)(T args){
     Apply!T app;
-    foreach(i, Type; T) app.value[i] = value[i];
+    app._v = args;
+
     return app;
 }
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int f0(int i) { return i;}
     int f1(int i) { return i*i;}
     int f2(int i) { return i*i*i;}
@@ -660,6 +671,9 @@ template mapper(alias fun)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int foo(int i) { return i*i;}
     alias mapper!foo mfoo;
 
@@ -699,6 +713,9 @@ template tupler(alias fun)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int foo(int i) { return i*i;}
     alias tupler!foo tfoo;
     auto t = tuple(0,1,2,3,4);
@@ -740,6 +757,9 @@ void delegate(...) constantFun(T...)(T t) if (T.length == 0)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto one = constantFun(1);
     assert(equal(map!one(["a","b","abc"]), [1,1,1]));
 }
@@ -821,6 +841,9 @@ version(unittest)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple("bin", 1024, 3.14159,
                    "src", 0,    1.0,
                    "myDirectory/foo", 100, -2.3);
@@ -882,6 +905,9 @@ ExtendFun0!(fun, D) extendFun0(alias fun, D)(D defaultValue)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto t = tuple("bin", 1024, 3.14159,
                    "src", 0,    1.0,
                    "myDirectory/foo", 100, -2.3);
@@ -953,6 +979,9 @@ template eitherFun(F...)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int f1(int i) { return i;}
     double f2(double d) { return d*d;}
     int f3(int i, string s) { return i;}
@@ -1024,6 +1053,9 @@ template powerFun(alias fun, size_t n)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int inc(int i) { return i+1;}
     string conc(string s) { return s ~ s;}
 
@@ -1102,6 +1134,9 @@ version(unittest)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto dfoo = withDefaultValues!(foo3)(2,1.5); // two default values provided -> for j and for k
                                                 // so dfoo can accept 1, 2 or 3 arguments.
 
@@ -1167,6 +1202,8 @@ version(unittest)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto arr = [0,1,2,3];
 
@@ -1280,6 +1317,9 @@ template tuplifyImpl(alias fun) if (isFunction!fun) {
 //}
 //
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     string foo3(int a, string b, double c) {
         return to!string(a) ~ "+" ~ b ~ "+" ~ to!string(c);
     }
@@ -1442,6 +1482,9 @@ template CompatibilityFuncArgs(alias fun, ARGS...) if (!isFunction!(fun)) {
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     assert(CompatibilityFuncArgs!("a+b", int, int)); // 'string' function are templated by unaryFun or binaryFun
                                                      // They will always be compatible with their args
     assert(CompatibilityFuncArgs!(binaryFun!"a+b", int, int));
@@ -1546,6 +1589,9 @@ template naryFun(alias fun) if(!is(typeof(fun) == string))
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     alias naryFun!("a+b*c-d") test4;    // Creates a templated 4-args function test4(A, B, C, D)(A a, B b, C c, D d) { return a+b*c-d;}
     assert(test4(1,2,3,4) == 3);        // instantiate test4!(int, int, int, int)
     assert(test4(1.0,2.0,3,4) == 3.0);   // instantiate test4!(double, double, int, int)
@@ -1596,6 +1642,9 @@ void fillFromArray(Arr : T[], T, Tup...)(Arr arr, ref Tup tup) {
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     double[] d = [0.0, 1.0, 2.0];
     TypeTuple!(double, double, double) td;
     fillFromArray(d, td);
@@ -1630,6 +1679,9 @@ auto arrayApply(alias fun, T : U[], U)(T args) if (CompatibilityFuncArgs!(fun, T
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int foo(int a, int b, int c) {
         return a*b*c;
     }
@@ -1672,6 +1724,9 @@ template arrayifyImpl(alias fun) {
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int foo(int a, int b, int c) {
         return a*b*c;
     }
@@ -1711,6 +1766,9 @@ void fillFromTuple(size_t n = 0, T : Tuple!(TT), TT...)(T tup, ref TT typetup) {
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto tup = tuple(0, 'a', 1.23);
     TypeTuple!(int, char, double) tt;
     fillFromTuple(tup, tt);
@@ -1742,6 +1800,9 @@ auto tupleApply(alias fun, T : Tuple!(R), R...)(T args) if (CompatibilityFuncArg
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     string foo3(int a, string b, double c) {
         return to!string(a) ~ "+" ~ b ~ "+" ~ to!string(c);
     }
@@ -1906,6 +1967,9 @@ template ReverseParameter(alias fun, Param...){
 }
 
 unittest{
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    
     assert(iota(1, 10).ReverseParameter!(reduce!"a + b")(1) == 46);
     assert(iota(1, 10).ReverseParameter!(reduce, "a + b")(1) == 46);
 }

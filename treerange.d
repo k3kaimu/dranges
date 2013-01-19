@@ -18,6 +18,8 @@ import std.array,
 
 import dranges.functional : naryFun;
 
+version(unittest) import std.stdio;
+
 /**
 The basic node for a binary tree.
 */
@@ -151,6 +153,9 @@ I opTree(string op, I, T)(I ifNull, Tree!T tr) { return reduceTree!(Format!("a %
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    
     auto t0 = tree(0);
     auto t1 = tree(1, t0, tree(2));
     auto t3 = tree(3, t1, tree(4));

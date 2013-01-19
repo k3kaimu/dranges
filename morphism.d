@@ -28,6 +28,8 @@ import dranges.algorithm,
        dranges.tuple,
        dranges.typetuple;
 
+version(unittest) import std.stdio;
+
 
 /**
 Catamorphism.
@@ -114,6 +116,9 @@ typeof(ifTrue) hylo(alias ifTrue, alias constructor, alias predicate, alias next
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    
     int[] nums = [1,2,3,4,5];
     int[] e;
 

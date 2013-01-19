@@ -138,6 +138,9 @@ template isTransposed(R) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[][] mat = [[0,1,2,3], [4,5,6,7], [8,9,10,11]];
     assert(mat.length == 3);
     assert(equal(transpose(mat),
@@ -200,6 +203,9 @@ if (isRangeOfRanges!R)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+       
     int[][] r1 = [[0,1,2],[3,4,5]];
     auto toroid = torus(r1);
 

@@ -47,6 +47,9 @@ template isFunction(F)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int a;
     int foo() { return 0;}
     int bar(int a, int b) { return 0;}
@@ -77,6 +80,9 @@ template ElementTypes(R, Rest...) {
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1];
     auto r2 = [2.0, 3.1];
     auto r3 = cycle(['a','b','c']);
@@ -94,6 +100,9 @@ template CommonElementType(R...) if (allSatisfy!(isInputRange, R)) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,3,4];
     auto r2 = [0.0,1.0,2.0];
     auto s = cast(dchar[])"abc";
@@ -112,6 +121,9 @@ template CompatibleRanges(R...) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,3,4];
     auto r2 = [0.0,1.0,2.0];
     string s = "abc";
@@ -195,6 +207,9 @@ template hasLength2(R) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     assert(hasLength!(int[]));
     assert(hasLength!(int[3]));
     assert(hasLength!(string));
@@ -233,6 +248,9 @@ template rank(R) if (!isForwardRange!R)
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[] r1 = [0,1,2,3][];
     int[][] r2 = [r1, [4][], r1];
     int[][][] r3 = [r2, [[5,6][]][], r2];
@@ -256,6 +274,9 @@ template BaseElementType(R) if(isRangeOfRanges!(R)) {
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[][] arr = [[0,1][], [2,3][]];
     auto arr2 = [arr, [[4][]][], arr][];
     assert(is(BaseElementType!(typeof(arr)) == int), "BaseElementType test int[][] array.");
@@ -291,6 +312,9 @@ template BaseElementTypeUpTo(R, int maxDepth = int.max) if(isRangeOfRanges!(R)) 
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[][][][] array4;
     assert(is(BaseElementTypeUpTo!(typeof(array4), 0) == int[][][][]));
     assert(is(BaseElementTypeUpTo!(typeof(array4), 1) == int[][][]  ));
@@ -314,6 +338,9 @@ template someSatisfy(alias pred, R...) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     static assert(someSatisfy!(isIntegral, int, double));
     static assert(someSatisfy!(isIntegral, int, long));
     static assert(someSatisfy!(hasLength, int[], int[2])); // does not work with std.range.hasLength
@@ -370,6 +397,44 @@ template Signed(T) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     alias TypeTuple!(int, uint, ulong, double, ushort) Test;
     assert(is(staticMap!(Signed, Test) == TypeTuple!(int,int,long,double,short)));
+}
+
+
+template isPure(string code, T...){
+    import dranges.functional : naryFun;
+    enum bool isPure = is(typeof({auto ref f() pure {return naryFun!code(T.init);}}));
+}
+
+template isNothrow(string code, T...){
+    import dranges.functional : naryFun;
+    enum bool isNothrow = is(typeof({auto ref f() nothrow {return naryFun!code(T.init);}}));
+}
+
+template isSafe(string code, T...){
+    import dranges.functional : naryFun;
+    enum bool isSafe = is(typeof({auto ref f() @safe {return naryFun!code(T.init);}}));
+}
+
+
+/**
+
+*/
+template checkFunctionAttribute(int type, string code, T...){
+    enum bool checkFunctionAttribute = 
+    ((type & FunctionAttribute.pure_) ? dranges.traits.isPure!(code, T) : true) &&
+    ((type & FunctionAttribute.nothrow_) ? dranges.traits.isNothrow!(code, T) : true) &&
+    ((type & FunctionAttribute.safe) ? dranges.traits.isSafe!(code, T) : true);
+}
+
+unittest{
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    
+    static assert(checkFunctionAttribute!(FunctionAttribute.pure_ | FunctionAttribute.nothrow_ | FunctionAttribute.safe,
+                    "a+a", int));
 }

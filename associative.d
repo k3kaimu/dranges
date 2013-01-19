@@ -15,10 +15,12 @@ import std.algorithm,
        std.range,
        std.typecons;
 
+version(unittest) import std.stdio;
 
 /**
 Simple helper function to duplicate an associative array.
 */
+@property
 V[K] dup(K,V)(V[K] aa)
 {
     V[K] _aa;
@@ -75,6 +77,9 @@ AsRange!(K,V) asRange(K,V)(V[K] aa) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    
     auto aa = ["Hello":5, "World!":6, "a":99, "":0, "Howdy":6];
     auto aa_range = aa.asRange;
     assert(is(ElementType!(typeof(aa_range)) == Tuple!(string, int)));

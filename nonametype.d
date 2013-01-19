@@ -25,6 +25,8 @@ import std.typecons         : Tuple;
 
 import dranges.typetuple    : TypeNuple;
 
+version(unittest) import std.stdio;
+
 //create no name struct or union 's member
 private string createNNMembers(T...)(){
     string dst;
@@ -59,6 +61,9 @@ template NNUnion(T...)if(T.length && !(T.length&1)){
     mixin("union NNUnion{" ~ createNNMembers!T() ~ "}");
 }
 unittest{
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     NNUnion!(int[2], "_int", long, "_long") a;
 
     a._int[0] = 12;
@@ -82,6 +87,9 @@ template NNStruct(T...)if(T.length && !(T.length&1)){
     mixin("struct NNStruct{" ~ createNNMembers!T() ~ "}");
 }
 unittest{
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     NNStruct!(string, "str", uint, "value") a;
 
     a.str = "12";
@@ -107,6 +115,9 @@ template Nuple(T, size_t N){
     alias NNUnion!(Tuple!(TypeNuple!(T, N)), "nuple", T[N], "array") Nuple;
 }
 unittest{
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     import std.typecons :   tuple;
 
     Nuple!(int, 3)  npi3;   //union{Tuple!(int, int, int) nuple, int[3] array}
@@ -153,6 +164,9 @@ template addTraits(string decl, T)
 }
 
 unittest{
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[] r = [0, 1, 2, 3, 4];
     auto nr = r.addTraits!q{@property size_t rank(){return 1;}};
     auto v = nr.value;
@@ -206,6 +220,9 @@ auto clearAllAddition(T)(T value)
 
 
 unittest{
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    
     import std.range : isInputRange;
 
     int[] r = [0, 1, 2, 3, 4];

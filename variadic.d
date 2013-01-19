@@ -17,6 +17,8 @@ import dranges.functional,
        dranges.templates,
        dranges.typetuple;
 
+version(unittest) import std.stdio;
+
 ///
 CommonType!T max(T...)(T t) if (T.length) { // I should test for a correct type: one that defines min and opCmp
     CommonType!T result = CommonType!T.min;
@@ -114,6 +116,9 @@ template Min(alias a, Rest...) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     assert(Max!1 == 1);
     assert(Max!(1,2) == 2);
     assert(Max!(1,2,4,3,0) == 4);

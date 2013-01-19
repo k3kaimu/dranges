@@ -81,7 +81,8 @@ ElementType!R minOf(R)(R range) if (isForwardRange!R) {
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
     
     auto r1 = [1,2,3,4,5];
     auto r2 = [-1.0,2.7818281828, 3.1415926];
@@ -117,8 +118,9 @@ size_t[ElementType!R] frequency(R)(R range) if (isInputRange!R)
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r = "Mississippi";
     auto f = frequency(r);
     assert(f['i'] == 4);
@@ -162,9 +164,9 @@ template NMapType(alias fun, R)
 
 unittest
 {
-    
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,3,4,5,6];
     auto nm1 = nmap!"a*b"(r1); // Will map "a*b" on (0,1), (1,2), (2,3), (3,4), (4,5), (5,6)
     assert(equal(nm1, [0,2,6,12,20,30][]));
@@ -528,8 +530,9 @@ template tmap(alias fun, R...)
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [1,2,3,4,5,6];
     auto s = "abcdefghijk".dup;
     auto tm1 = tmap!" std.range.repeat(a, b)"(s, r1); // [a], [b,b], [c,c,c], [d,d,d,d], ...
@@ -615,8 +618,9 @@ if(__traits(compiles, nfilter!(fun, step)(R.init)))
 unittest
 {
     import std.stdio;
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,3,3,5,4,3,2,1,0];
     int foo(int a, int b, int c) { return a<=b && b<=c;} // increase on three elements
     
@@ -972,8 +976,9 @@ if(__traits(compiles, tfilter!fun(R.init)))
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto    r1 = [ 0,   1,   2,   3,   4,   5];
     auto r2 = [ 3.0, 4.0, 5.0, 6.0];
     string[] r3 = ["a", "b", "cc"];
@@ -1155,8 +1160,9 @@ public:
 
 unittest // taken from std.algorithm.reduce unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto a = [ 3, 4 ];
     auto r = reduce!("a + b")(0, a);
     assert(r == 7);
@@ -1283,8 +1289,9 @@ Iterate!(fun, S) iterate(alias fun, S)(S seed)
 //}
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     // Generating the natural numbers
     auto natural = iterate!"a+1"(1);    // 1,2,3,4,5, (as ints)
     assert(equal(take(natural, 5), [1,2,3,4,5][]));
@@ -1407,8 +1414,9 @@ Scan!(fun, ElementType!R, R) scan(alias fun, R)(R range) if (/*isForwardRange*/i
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     // moving sum
     auto r1 = [1,2,3,4];
     auto s = scan!"a+b"(0,r1);
@@ -1575,8 +1583,9 @@ ScanR!(fun, ElementType!R, R) scanR(alias fun, R)(R range) if (isBidirectionalRa
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [1,2,3,4];
     auto s = scanR!"a+b"(0,r1); // moving sum
     assert(equal(s, [0,4,7,9,10][])); // 4, 3+4, 2+3+4, 1+2+3+4
@@ -1730,8 +1739,9 @@ Concat!(typeof(map!fun(R.init))) flatMap(alias fun, R)(R range) {
 }
 
 unittest {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     string text = "this is just a test.\nI mean, I have no idea\nif this will work.";
     auto lines = splitLines(text);
     assert(equal(lines, ["this is just a test.", "I mean, I have no idea", "if this will work."][]));
@@ -1889,8 +1899,9 @@ Tuple!(int, real) toCF(real d) { return tuple(to!int(floor(d)), 1.0 / (d - trunc
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     // Generating Fibonacci numbers
     auto fibs = unfold!"tuple(a,b,a+b)"(0,1);
     assert(equal(take(fibs, 10), [0,1,1,2,3,5,8,13,21,34][]));
@@ -2006,8 +2017,9 @@ Unfold2!(fun, pred, T) unfold2(alias fun, alias pred, T...)(T initialParameters)
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
 //    Tuple!(int, int, int) fibonacci(int a, int b) { return tuple(a, b, a+b);}
     auto fibs = unfold2!("tuple(a,b,a+b)", "a > 100")(0,1); // stops when the generated value is > 100
     assert(equal(fibs, [0,1,1,2,3,5,8,13,21,34,55,89][]));
@@ -2089,8 +2101,9 @@ template CompType(alias gen, alias pred, R...) {
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     Tuple!(int, int, int) foo(int a, int b, int c) { return tuple(a,b,c);}
     int foo2(int a, int b, int c) { return a+b+c;}
     bool pythagorean(int a, int b, int c) { return a*a+b*b == 2*c*c && a<b;}
@@ -2126,8 +2139,9 @@ template IntersectionType(R...) {
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,3,2,3];
     auto r2 = [2.0,4,5,3,7,1,0];
     short[] r3 = [-2,-3,1,0];
@@ -2180,8 +2194,9 @@ Without!(typeof(chain(R.init)), IntersectionType!R) symmetricDifference(R...)(R 
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,3,7];
     auto r2 = [1,2,5,6,0];
     auto s = symmetricDifference(r1, r2);
@@ -2243,8 +2258,9 @@ template PCompType(alias gen, alias pred, R...) {
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = numbers(1,100);
     string sentence = "The quick brown fox jumped over the lazy dog.";
     auto words = split(sentence);
@@ -2284,8 +2300,9 @@ AsSet!(CompType!(gen,pred,R)) setComp(alias gen, alias pred, R...)(R inputs) {
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto input = numbers(1,5);
     auto sc = setComp!("a+b+c", "a + b > c")(input, input, input);
     assert(equal(sc, [3,4,5,6,7,8,9,10,11,12][]));
@@ -2357,8 +2374,9 @@ Merge!(pred, R) merge(alias pred = "a<b", R...)(R ranges) if (allSatisfy!(isForw
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r = [0,2,3];
     auto r2 = [1,4,5];
     auto r3 = [1,6,7,0];
@@ -2471,8 +2489,9 @@ PCompType!("b","a",bool[], R) select(R)(bool[] flags, R range) if (isForwardRang
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r = [0,1,2,3];
     auto s01 = select([false, true][], r);
     assert(equal(s01, [1][]));
@@ -2538,8 +2557,9 @@ template SubRanges(R) if (isForwardRange!R)
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r = [0,1,2];
     auto sr = subranges(r);
     int[][] witness = [[], [0], [1], [0,1], [2], [0,2], [1,2], [0,1,2]];
@@ -2638,8 +2658,9 @@ ElementType!R[] sortAsArray(alias pred = "a < b", R)(R range) if (isForwardRange
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [5,1,2,3,4];
     auto r2 = [4.0,3.0,2.0,1.0,0.0];
     auto r3 = ["abc","def","ghi"];
@@ -2719,8 +2740,9 @@ Group!(R) group(R)(R range) {
 }
 
 unittest {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto test = [0,1,1,2,2,2,3,3,3,3,4,4,4,5,5,6];
     auto g = group(test);
     assert(equal(g, [[0], [1,1], [2,2,2], [3,3,3,3], [4,4,4], [5,5], [6]][]));
@@ -2802,8 +2824,9 @@ bool contains(R1, E)(R1 range1, E element) if (isInputRange!R1 && !isInputRange!
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     assert("foobarbaz".contains("bar")); // true
     assert("foobarbaz".contains("b"));   // true
     assert("foobarbaz".contains('b'));   // true
@@ -3115,8 +3138,9 @@ template IndicesType(alias value, R) {
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,3,4,2,2];
     auto i1 = indices!2(r1);
     assert(equal(i1, [2,5,6][])); // finding an int in a int[]
@@ -3162,8 +3186,9 @@ PCompType!("a","b", Numbers, typeof(map!pred(R.init))) positions(alias pred, R)(
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,3,4,5,6,1];
     auto p1 = positions!"a%2==0"(r1);
     assert(equal(p1, [0,2,4,6][]));
@@ -3173,7 +3198,7 @@ unittest
     assert(p3.empty);
 
     auto s = "banana";
-    auto p4 = positions!(isOneOf!"bn")(s);
+    auto p4 = positions!(a => a.isOneOf("bn") )(s);
     assert(equal(p4, [0,2,4][]));
 
     int[] e;
@@ -3207,8 +3232,9 @@ TMapType!(atIndex!(R, ElementType!I), Combinations!(Once!R, I)) fromIndex(I, R)(
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto s = cast(immutable(dchar)[])"abcdefg";
 
     auto i1 = map!"a%4"(numbers(10)); // 0,1,2,3,0,1,2,3,0,1
@@ -3273,8 +3299,9 @@ ToIndex!R toIndex(R)(R range) if (isForwardRange!R)
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto s = cast(immutable(dchar)[])"abcdefabcdefghab";
     auto ti = toIndex(s);
     assert(equal(ti, [0,1,2,3,4,5,0,1,2,3,4,5,12,13,0,1][]));
@@ -3309,8 +3336,9 @@ Tuple!(typeof(filter!pred(R.init)), typeof(filter!(Not!pred)(R.init))) separate(
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r = [0,1,2,3,4,5];
     auto s = separate!"a<1 || a>3"(r);
     assert(equal(first(s),  [0,4,5][]));
@@ -3336,8 +3364,9 @@ Tuple!(typeof(takeWhile!pred(R.init)), R) span(alias pred, R)(R range)
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r = map!"a*a"([0,1,2,3,4,5,4,3,2][]);
     auto s = span!"a<10"(r);
     assert(equal(first(s), [0,1,4,9][]));
@@ -3368,8 +3397,9 @@ ElementType!R[] squeeze(E, R)(E element, R range) if (isForwardRange!R)
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,2,3,4,5,2,2,2,3,5,6,8,3,2];
     string r2 = "abcd  ef g h    ";
     assert(equal(squeeze(2, r1), [0,1,2,3,4,5,2,3,5,6,8,3,2][]));
@@ -3466,8 +3496,9 @@ Combinations!(R) combinations(R...)(R ranges) if (R.length && allSatisfy!(isForw
 }
 
 unittest {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2]; // Random-access range
     auto r2 = ["a","b","c","d"];
     auto r3 = map!"a + 3.0"(r1); // Forward range
@@ -3689,8 +3720,9 @@ Permutations!(ElementType!R[]) permutations(R)(R r, size_t n) if (!isDynamicArra
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
-    
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r = [0,1,2]; // array
     auto m = map!"a*a"(r); // not an array...
 
@@ -3851,7 +3883,8 @@ template ChooseType(uint repetition, R) if (isForwardRange!R && !isInfinite!R)
 
 unittest
 {
-    scope(failure) writeln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(failure) writefln("Unittest Failure : ", __FILE__, " : ", __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
     
     // A poker hand is five cards without repetition among 52 cards.
     // That makes 2,598,960 possible hands.

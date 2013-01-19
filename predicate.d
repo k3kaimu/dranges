@@ -24,6 +24,8 @@ import dranges.functional,
        dranges.traits,
        dranges.typetuple;
 
+version(unittest) import std.stdio;
+
 /**
 Is true if some (at least one) element in range verify the predicate pred. False otherwise.
 Typically, it's used with a unary (1-arg) predicate, but it accepts predicates of any arity.
@@ -96,6 +98,9 @@ template some(alias pred, R)if(isInputRange!R){
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[] r1 = [0,1,2,3];
     int[] r2 = [];
     assert(some!"a>0"(r1));
@@ -151,6 +156,9 @@ bool all(alias pred, R)(R range) if (isForwardRange!R && dranges.functional.arit
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[] r1 = [0,1,2,3];
     int[] r2 = [];
     assert(all!"a>=0"(r1));
@@ -230,6 +238,9 @@ bool allDifferent(R)(R range) if (isInputRange!R)
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     auto r1 = [0,1,2,3,4,5];
     auto r2 = [0,1,2,3,3,3];
     auto r3 = [0,0,0,0,0,0];
@@ -307,6 +318,9 @@ bool allVerify(alias pred, R...)(R ranges) if (allSatisfy!(isInputRange, R)){
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[] r1 = [0,1,2];
     string r2 = "abc";
     assert(allVerify!"a.length > 2"(r1,r2));
@@ -330,6 +344,9 @@ bool someVerify(alias pred, R...)(R ranges) if (allSatisfy!(isInputRange, R)){
 }
 
 unittest {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[] r1 = [0,1,2];
     string r2 = "abcde";
     assert(someVerify!"a.length > 4"(r2));
@@ -353,19 +370,14 @@ template haveLength(size_t l, R...) if (allSatisfy!(hasLength, R)) {
 
 
 /**
-Returns true iff element is one of the elements of range.
+Returns true if element is one of the elements of range.
 Used as a predicate to find a subrange inside another range: $(M dropWhile!(isOneOf!"abc")(r1))
-It may never terminate if range is infinite,
-but as an optimization, $(M isOneOf) detects $(D Cycle!U) and works only on the cycle internal range.
-See_Also: $(M dranges.algorithm.contains). Maybe I could define one with another...
+
 Example:
 ----
 string s = "01212345";
 auto m = map!(a => a.isOneOf("012"))(s);
 assert(equal(m, [true,true,true,true,true,false,false,false][]));
-auto c = cycle("012");
-auto m2 = map!(a => a.isOneOf(cycle("012")))(s); // doesn't hang, as it's equivalent to isOneOf!"012"
-assert(equal(m2, m));
 ----
 */
 /+
@@ -378,27 +390,22 @@ bool isOneOf(alias range)(T element)if(is(typeof(find(range, element)))){
     }*/
     return !(find(range, element).empty);
 }+/
-template isOneOf(alias range, alias pred = "a == b"){
-    bool isOneOf(T)(T element){
-        return some!(a => binaryFun!(pred)(a, element))(range);
-    }
-}
-
 template isOneOf(alias pred = "a == b", R, T){
     bool isOneOf(T element, R range){
-        return some!(a => binaryFun!(pred)(a, element))(range);
+        return !(find!(pred)(range, element).empty);
     }
 }
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     string s = "01212345";
     auto m = map!(a => a.isOneOf("012"))(s);
     assert(equal(m, [true,true,true,true,true,false,false,false][]));
-    auto c = cycle("012");
-    auto m2 = map!(a => a.isOneOf(cycle("012")))(s); // doesn't hang, as it's equivalent to isOneOf!"012"
-    assert(equal(m2, m));
 }
+
 
 bool delegate(ElementType!R) isOneOf(R)(R range) if (isInputRange!R)
 {
@@ -432,10 +439,13 @@ bool allEqual(T...)(T vals) {
 
 unittest
 {
-  assert(allEqual(1,1.0,1.0000,1)); // The values are automatically converted
-  assert(allEqual(1)); // one element, always true.
-  assert(allEqual()); // no element, always true.
-  assert(!allEqual(1,2));
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
+    assert(allEqual(1,1.0,1.0000,1)); // The values are automatically converted
+    assert(allEqual(1)); // one element, always true.
+    assert(allEqual()); // no element, always true.
+    assert(!allEqual(1,2));
 }
 
 /**
@@ -460,6 +470,9 @@ bool equals(alias value, T)(T t) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
     int[] r = [0,1,0,1,2,0,3];
     assert(equals!0(r.front));
     auto m = map!(equals!(0,int))(r);
@@ -504,6 +517,9 @@ template Not(alias fun) {
 
 unittest
 {
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+       
     int[] r = [0,1,2,3,4,5];
     auto f1 = filter!isOdd(r);
     auto f2 = filter!(Not!isEven)(r);
