@@ -808,7 +808,7 @@ public:
     }
 
 
-    auto opCmp(U)(auto ref Rational!U r) const {
+    auto opCmp(U)(auto ref const Rational!U r) const {
         static if(is(typeof({auto _gcd = gcd(_den, r._den);}))){
             auto _gcd = gcd(_den, r._den);
             return (_num * (r._den / _gcd)) - (r._num * (_den / _gcd));
