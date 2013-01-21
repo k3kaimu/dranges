@@ -68,7 +68,7 @@ unittest{
 }
 
 
-//すべての演算がpure nothrow @safe性を満たすかどうか
+///
 private
 template isLikeBuiltInInt(T){
     enum checkCode = q{
@@ -1082,9 +1082,7 @@ unittest{   //BigInt test
 }
 
 
-/**
-型TがRationalならtrue
-*/
+///ditto
 template isRationalType(T){
     enum bool isRationalType = is(T == Rational!T);
 }
