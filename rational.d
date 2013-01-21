@@ -495,7 +495,7 @@ public:
 
 
     bool opEquals(U)(auto ref const U u) pure nothrow @safe const if(!isRationalType!U){
-        return _num == u * _den;
+        return _den == 1 && _num == u;
     }
 
 
@@ -642,14 +642,14 @@ public:
 
 
     ///ditto
-    bool opCast(U : bool)() {
+    bool opCast(U : bool)() const {
         return _num != 0;
     }
 
 
     ///ditto
-    U opCast(U : T)() {
-        return _num / _den;
+    U opCast(U : T)() const {
+        return cast()_num / cast()_den;
     }
 
 
@@ -801,18 +801,27 @@ public:
 
 
     auto opCmp(U)(auto ref const U r) const if(!isRationalType!U){
-        return _num - r * _den;
+        static if(is(typeof(_num - r * _den)))
+            return _num - r * _den;
+        else
+            return (cast()_num) - (cast()r) * (cast()_den);
     }
 
 
     auto opCmp(U)(auto ref Rational!U r) const {
-        auto _gcd = gcd(_den, r._den);
-        return (_num * (r._den / _gcd)) - (r._num * (_den / _gcd));
+        static if(is(typeof({auto _gcd = gcd(_den, r._den);}))){
+            auto _gcd = gcd(_den, r._den);
+            return (_num * (r._den / _gcd)) - (r._num * (_den / _gcd));
+        }
+        else{
+            auto _gcd = gcd(cast()_den, cast()r._den);
+            return ((cast()_num) * ((cast()r._den) / _gcd)) - ((cast()r._num) * ((cast()_den) / _gcd));
+        }
     }
 
 
     bool opEquals(U)(auto ref const U u) const if(!isRationalType!U){
-        return _num == u * _den;
+        return _den == 1 && _num == u;
     }
 
 
@@ -945,7 +954,7 @@ unittest{   //int test
     r1 %= 3;            //r(18, 6)
     assert(r1 == r(5, 2)); //r(25, 10)
     r1 = r(-25, 10);    //r(-25, 10)
-    r1 %= r(2, 5);     //r(6, 10)
+    r1 %= r(2, 5);      //r(6, 10)
     assert(r1 == r(-1, 10));
 
     r1 = r(-1, 3);
@@ -953,6 +962,11 @@ unittest{   //int test
     assert(r1 == r(-1, 27));
     r1 ^^= -2;
     assert(r1 == r(729, 1));
+
+    assert(r1 == 729);
+    assert(r1 < 799);
+    assert(r1 < r(700*8, 3));
+    assert(r1 > r(700*2, 3));
 }
 
 unittest{   //BigInt test
@@ -1079,6 +1093,13 @@ unittest{   //BigInt test
     assert(r1 == r(-1, 27));
     r1 ^^= -2;
     assert(r1 == r(729, 1));
+
+    assert(r1 == 729);
+    assert(r1 == BigInt(729));
+    assert(r1 <= BigInt(729));
+    assert(!(r1 < r(729)));
+    assert(r1 < r(700*8, 3));
+    assert(r1 > r(700*2, 3));
 }
 
 
