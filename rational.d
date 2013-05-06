@@ -189,19 +189,19 @@ assert(r.den == 1);
 
 assert(r == rational(5));       // rational(5) == rational(5, 1)
 
-assert(r == 5.per(1));          // UFCS : n.per(d) == n.rational(d) == rational(n, d)
+assert(r == 5.over(1));          // UFCS : n.over(d) == n.rational(d) == rational(n, d)
 
-r *= -1.per(5);
+r *= -1.over(5);
 assert(r.num == -1);            // If rational value is negative, numerator is always negative.
 assert(r.den == 1);             // But denominator is always positive.
 assert(r == rational(1, 1));    // (5 / 1) * (1 / 5) == (1 / 1)
 assert(r == 1);                 // Can check equality to T by "==" operator.
 assert(r > 2);                  // Also comparison operator.
 
-r1 = 2.per(5) + 3;              // You can use Rational!T like T.
+r1 = 2.over(5) + 3;              // You can use Rational!T like T.
 
 import std.bigint;
-Rational!BigInt rb = 10.per(33);// You can use BigInt as T.
+Rational!BigInt rb = 10.over(33);// You can use BigInt as T.
 rb ^^= -10;
 assert(rb == Rational!BigInt(BigInt(33)^^10, BigInt(10)^^10));
 ---
@@ -214,7 +214,7 @@ Example:
 void foo() pure nothrow @safe
 {
     auto r = rational(1, 3);    //int is pure nothrow @safe type
-    r += 3.per(4);
+    r += 3.over(4);
     ...
 }
 -------------------------------------------------------
@@ -981,7 +981,7 @@ Rational!(Unqual!(CommonType!(T, U))) rational(T, U)(T num, U den, bool nonReduc
 
 
 ///ditto
-alias per = rational;
+alias over = rational;
 
 
 unittest{   //int test
@@ -998,7 +998,7 @@ unittest{   //int test
 
         static assert(r(2, 15) == r(4, 5) % r(1, 6));   //CTFEable
 
-        assert(3.per(2) == r(3, 2));    //num.per(den)
+        assert(3.over(2) == r(3, 2));    //num.over(den)
 
         //opUnary and cast test
         assert(-r(5) == r(-5, 1));
@@ -1142,7 +1142,7 @@ unittest{   //int test
     assert(writer.data == "00000729/00000001");
 
 
-    assert(-1.per(5) == rational(-1, 5));
+    assert(-1.over(5) == rational(-1, 5));
 }
 
 unittest{   //BigInt test
