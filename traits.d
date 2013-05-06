@@ -438,3 +438,75 @@ unittest{
     static assert(checkFunctionAttribute!(FunctionAttribute.pure_ | FunctionAttribute.nothrow_ | FunctionAttribute.safe,
                     "a+a", int));
 }
+
+
+/**
+This template return arity of a function.
+
+Example:
+---
+template Generator0(size_t N)
+{
+    alias TypeNuple!(int, N) Generator0;
+}
+
+alias templateFunctionAnalysis!(( (a, b, c) => a), Generator0) Result0;
+
+static assert(Result0.arity == 3);
+static assert(Result0.endN == 3);
+static assert(is(Result0.ArgumentTypes == Generator0!3));
+static assert(is(Result0.ReturnType == int));
+
+
+template Generator1(size_t N)
+{
+    alias TypeTuple!(int, ushort, long, double*, uint, real[])[N] Generator1;
+}
+
+static assert(Result1.arity == 1);
+static assert(Result1.endN == 3);
+static assert(is(Result1.ArgumentTypes == double*));
+static assert(is(Result1.ReturnType == double*));
+---
+
+Authors: Kazuki Komatsu(k3_kaimu)
+*/
+template templateFunctionAnalysis(alias templateFun, alias ParameterGenerator, size_t startN = 0, size_t limittedN = 10)
+{
+    template arityTPN(size_t N){
+        static if(is(typeof(templateFun(ParameterGenerator!N.init))))
+            enum arityTPN = N;
+        else static if(N < limittedN)
+            enum arityTPN = arityTPN!(N+1);
+        else{
+            static assert(0, "arity Error : " ~ templateFun.stringof);
+        }
+    }
+
+    enum endN = arityTPN!(startN);
+    alias ParameterGenerator!(endN) ArgumentTypes;
+    enum arity = TypeTuple!(ArgumentTypes).length;
+    alias typeof(templateFun(ArgumentTypes.init)) ReturnType;
+}
+
+unittest 
+{
+    import dranges.templates;
+    alias InlineTemplate!("size_t N", q{alias TypeNuple!(int, N) IT;}) Generator0;
+    alias templateFunctionAnalysis!(( (a, b, c) => a), Generator0) Result0;
+
+    static assert(Result0.arity == 3);
+    static assert(Result0.endN == 3);
+    static assert(is(Result0.ArgumentTypes == Generator0!3));
+    static assert(is(Result0.ReturnType == int));
+
+
+
+    alias InlineTemplate!("size_t N", q{alias TypeTuple!(int, ushort, long, double*, uint, real[])[N] IT;}) Generator1;
+    alias templateFunctionAnalysis!(((double* a) => a), Generator1) Result1;
+
+    static assert(Result1.arity == 1);
+    static assert(Result1.endN == 3);
+    static assert(is(Result1.ArgumentTypes == double*));
+    static assert(is(Result1.ReturnType == double*));
+}
