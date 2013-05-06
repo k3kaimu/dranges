@@ -58,12 +58,12 @@ assert(minOf(r2) == -1.0);
 assert(maxOf(r2) == 3.1415926);
 ----
 */
-ElementType!R sum(R)(R range) if (isForwardRange!R) {
+ElementType!R sum(R)(R range) if (isInputRange!R) {
     return reduce!"a+b"(to!(ElementType!R)(0), range);
 }
 
 /// ditto
-ElementType!R product(R)(R range) if (isForwardRange!R) {
+ElementType!R product(R)(R range) if (isInputRange!R) {
     return reduce!"a*b"(to!(ElementType!R)(1), range);
 }
 
@@ -245,9 +245,10 @@ template tmap(fun...)if(fun.length >= 1){
         static if(is(typeof(TMap!(staticMap!(Unqual, T))(args))))
             return TMap!(staticMap!(Unqual, T))(args);
         else{
-            static assert(fun.length == 1);
-            alias InlineTemplate!("alias f", `auto IT(T...)(Tuple!T e){return naryFun!(f)(e.field);}`) nf;
-            return map!(Prepare!(fun[0]))(knit(args));
+            //static assert(fun.length == 1);
+            //alias InlineTemplate!("alias f", `auto IT(T...)(Tuple!T e){return naryFun!(f)(e.field);}`) nf;
+            return map!(staticMap!(Prepare, staticMap!(naryFun, fun)))(knit(args));
+            //return map!(Prepare!(fun[0]))(knit(args));
         }
     }
 
