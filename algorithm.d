@@ -859,8 +859,19 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
             @property auto ref back()
             {
                 static if(normalElementReturn)
+                {
+                    static if(ETS.length == 1)
+                        return _back()[0];
+                    else
                     return _back();
+                }
                 else{
+                    static if(RangesTypesIndex.length == 1)
+                    {
+                        return _input[RangesTypesIndex[0]].back;
+                    }
+                    else
+                    {
                     Tuple!(staticMap!(ElementType, RangesTypes)) dst;
                     
                     foreach(i, idx; RangesTypesIndex)
@@ -868,6 +879,7 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
                     
                     return dst;
                 }
+            }
             }
             
             private auto _back()
@@ -884,6 +896,7 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
                 return result;
             }
             
+
             void popBack()
             {
                 if(!this.empty)
@@ -926,8 +939,19 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
         @property auto ref front()
         {
             static if(normalElementReturn)
+            {
+                static if(ETS.length == 1)
+                    return _front()[0];
+                else
                 return _front();
+            }
             else{
+                static if(RangesTypes.length == 1)
+                {
+                    return _input[RangesTypesIndex[0]].front;
+                }
+                else
+                {
                 Tuple!(staticMap!(ElementType, RangesTypes)) dst;
                 
                 foreach(i, idx; RangesTypesIndex)
@@ -935,6 +959,7 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
                 
                 return dst;
             }
+        }
         }
         
         private auto _front()
@@ -1017,8 +1042,8 @@ unittest
     
     //if second parameter is not [], this tfilter operate like arguments that is RangeType is not Range.
     auto tf8 = tfilter!("!(a%c) && !b.empty", [0])(r1, r2, 2);
-    assert(equal(tf8, [tuple(0), tuple(2), tuple(4)]));
-    assert(equal(tf8.retro, [tuple(4), tuple(2), tuple(0)]));
+    assert(equal(tf8, [0, 2, 4]));
+    assert(equal(tf8.retro(), [4, 2, 0]));
     
     //of course, if third parameter is true, this range includes all parameter.
     auto tf9 = tfilter!("b < 5.0 && !a.empty", [1], true)(r1, r2, 2);
