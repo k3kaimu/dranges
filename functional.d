@@ -1574,8 +1574,8 @@ if(is(typeof(fun) == string))
         mixin(createAliasAlphabet(T.length));
         return mixin(fun);
     }
-    
-    
+
+
     auto ref naryFunNumber(T...)(auto ref T args)
     {
         mixin(createAliasNumber(T.length));
@@ -1647,8 +1647,8 @@ unittest
     alias naryFun!"f" projection6; // 'a' -> 1 arg, 'b' -> binary, ..., 'f' -> 6-args function. In this case, returning only its sixth argument.
     assert(projection6(0,1,2,3,4,5) == 5);
     
-    alias naryFun!"3" test0;               // A 0-arg function. It's exactly: int test0() { return 3;}
-    assert(test0 == 3);                    // Constant return
+    alias naryFun!"3" test0;                // A 0-arg function. It's exactly: int test0() { return 3;}
+    assert(test0 == 3);                     // Constant return
     assert(test0() == 3);                   // But it's a function, not a constant.
 
     int foo(int a, int b) { return a*b;}

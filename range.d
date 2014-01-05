@@ -5218,26 +5218,31 @@ if(!isForwardRange!(Unqual!Range) && isInputRange!(Unqual!Range) )
     alias ElementType!R E;
     alias size_t Handle;
 
-    struct ToForwardRanged{
-    private:
-        Buffer _buffer;
+    struct ToForwardRanged
+    {
+      private:
+        Buffer* _buffer;
         Handle _handle;
 
-
-    public:
-        this(R r){
+      public:
+        this(R r)
+        {
             _buffer = new Buffer(r);
             _handle = _buffer.getHandle(0);
         }
 
 
-        this(this) pure nothrow @safe {
+        this(this) pure nothrow @safe
+        {
             _handle = _buffer.getNewChild(_handle);
         }
 
 
-        pure @safe ~this(){
+        ~this() pure @safe
+        {
             _buffer.releaseHandle(_handle);
+            if(_buffer.canDestroy)
+                _buffer.destroy();
         }
 
 
@@ -5253,46 +5258,53 @@ if(!isForwardRange!(Unqual!Range) && isInputRange!(Unqual!Range) )
 
 
         @property
-        E front() pure nothrow @safe const{
+        E front() pure nothrow @safe const
+        {
             return _buffer.getValue(_handle);
         }
 
 
         @property
-        bool empty()pure nothrow @safe const{
+        bool empty()pure nothrow @safe const
+        {
             return _buffer.isEmpty(_handle);
         }
 
 
-        void popFront(){
+        void popFront()
+        {
             _buffer.popFront(_handle);
         }
 
 
         @property
-        typeof(this) save() pure @safe{
+        typeof(this) save() pure @safe
+        {
             typeof(this) dst = this;
             dst._handle = _buffer.getNewChild(_handle);
             return dst;
         }
 
 
-        void detach() pure @safe{
+        void detach() pure @safe
+        {
             _buffer.releaseHandle(_handle);
             _buffer = null;
         }
     }
 
 
-    class Buffer{
-    private:
+    struct Buffer
+    {
+      private:
         R _range;
         E[] _buf;                       //バッファ
         Tuple!(size_t, size_t) _slice;  //スライス。cycle(_buf)[_slice[0] .. _slice[1]]が範囲
-        size_t[Handle] _idxs;   //各Handleでの現在の位置
-        size_t _emptyPos;                //emptyとなる位置
+        size_t[Handle] _idxs;           //各Handleでの現在の位置
+        size_t _emptyPos;               //emptyとなる位置
 
-        void reSlicing() pure @safe {
+        void reSlicing() pure @safe
+        {
             size_t min = _slice[1];
             foreach(k, v; _idxs){
                 if(v < min)
@@ -5312,8 +5324,9 @@ if(!isForwardRange!(Unqual!Range) && isInputRange!(Unqual!Range) )
         }
 
 
-    public:
-        this(R range){
+      public:
+        this(R range)
+        {
             _range = range;
             _buf = new E[1024];
             _slice = tuple(0, 1);
@@ -5382,12 +5395,14 @@ if(!isForwardRange!(Unqual!Range) && isInputRange!(Unqual!Range) )
         in{
             assert(h in _idxs);
         }
-        body{
+        body
+        {
             return _idxs[h] >= _emptyPos;
         }
 
 
-        void popFront(Handle h){
+        void popFront(Handle h)
+        {
             size_t cpos = _idxs[h];
             ++_idxs[h];
 
@@ -5407,6 +5422,14 @@ if(!isForwardRange!(Unqual!Range) && isInputRange!(Unqual!Range) )
                 }else
                     _emptyPos = _slice[1];
             }
+        }
+
+
+        bool canDestroy() pure @safe @property const
+        {
+            foreach(k, v; _idxs)
+                return false;
+            return true;
         }
     }
 }

@@ -70,17 +70,17 @@ callFoo( 2 ); // Actually calls foo!(2)( )
 ----
 */
 template staticSwitch( alias F, T... ) if ( allSatisfy!( isAlias, T ) ) {
-   auto With( CommonType!T index, ParameterTypeTuple!( F!( T[0] ) ) args ) {
-       switch ( index ) {
-           foreach ( i, e; T ) {
+    auto With( CommonType!T index, ParameterTypeTuple!( F!( T[0] ) ) args ) {
+        switch ( index ) {
+            foreach ( i, e; T ) {
                 mixin(`case ` ~ e.stringof ~ `: return F!(e)(args);`);
                 //return F!( e )( args );
-           }
-           default:
+            }
+            default:
                 assert(false);
-       }
-       assert( false );
-   }
+        }
+        assert( false );
+    }
 }
 
 version( unittest ) {

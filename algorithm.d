@@ -863,7 +863,7 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
                     static if(ETS.length == 1)
                         return _back()[0];
                     else
-                    return _back();
+                        return _back();
                 }
                 else{
                     static if(RangesTypesIndex.length == 1)
@@ -872,14 +872,14 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
                     }
                     else
                     {
-                    Tuple!(staticMap!(ElementType, RangesTypes)) dst;
-                    
-                    foreach(i, idx; RangesTypesIndex)
-                        dst[i] = _input[idx].back;
-                    
-                    return dst;
+                        Tuple!(staticMap!(ElementType, RangesTypes)) dst;
+                        
+                        foreach(i, idx; RangesTypesIndex)
+                            dst[i] = _input[idx].back;
+                        
+                        return dst;
+                    }
                 }
-            }
             }
             
             private auto _back()
@@ -943,7 +943,7 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
                 static if(ETS.length == 1)
                     return _front()[0];
                 else
-                return _front();
+                    return _front();
             }
             else{
                 static if(RangesTypes.length == 1)
@@ -952,20 +952,20 @@ template tfilter(alias fun, alias select = [], bool normalElementReturn = false)
                 }
                 else
                 {
-                Tuple!(staticMap!(ElementType, RangesTypes)) dst;
-                
-                foreach(i, idx; RangesTypesIndex)
-                    dst[i] = _input[idx].front;
-                
-                return dst;
+                    Tuple!(staticMap!(ElementType, RangesTypes)) dst;
+                    
+                    foreach(i, idx; RangesTypesIndex)
+                        dst[i] = _input[idx].front;
+                    
+                    return dst;
+                }
             }
-        }
         }
         
         private auto _front()
         {
             Tuple!(ETS) result;
-            
+                
             foreach(i, isRange; IndexOfRangeTypeTF){
                 static if(isRange)
                     result[i] = _input[i].front;
@@ -3911,7 +3911,7 @@ unittest
 {
     scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
     scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
-    
+
     // A poker hand is five cards without repetition among 52 cards.
     // That makes 2,598,960 possible hands.
     auto ranks = cast(char[])"A23456789TJQK";

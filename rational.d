@@ -105,14 +105,14 @@ template isLikeBuiltInInt(T){
             --b;
             b++;
             b--;
-            b = -b;
-            b = +b;
+            b = cast(const)-b;
+            b = cast(const)+b;
 
-            b += b;
-            b -= b;
-            b *= b;
-            b /= b;
-            b %= b;
+            b += cast(const)b;
+            b -= cast(const)b;
+            b *= cast(const)b;
+            b /= cast(const)b;
+            b %= cast(const)b;
             //b ^^= b;
 
             b += 1;
@@ -122,22 +122,22 @@ template isLikeBuiltInInt(T){
             b %= 1;
             b ^^= 1;
 
-            b = b + b;
-            b = b - b;
-            b = b * b;
-            b = b / b;
-            b = b % b;
+            b = cast(const)b + cast(const)b;
+            b = cast(const)b - cast(const)b;
+            b = cast(const)b * cast(const)b;
+            b = cast(const)b / cast(const)b;
+            b = cast(const)b % cast(const)b;
             //b = b ^^ b;
 
-            b = b + 1;
-            b = b - 1;
-            b = b * 1;
-            b = b / 1;
-            b = b % 1;
-            b = b ^^ 1;
+            b = cast(const)b + 1;
+            b = cast(const)b - 1;
+            b = cast(const)b * 1;
+            b = cast(const)b / 1;
+            b = cast(const)b % 1;
+            b = cast(const)b ^^ 1;
 
-            bool c = b < 0;
-            c = b == 0;
+            bool c = cast(const)b < 0;
+            c = cast(const)b == 0;
         }()};
     
     enum isLikeBuiltInInt = dranges.traits.isPure!(checkCode, T) && dranges.traits.isNothrow!(checkCode, T) && dranges.traits.isSafe!(checkCode, T);
@@ -243,7 +243,7 @@ void main(){
 ---
 */
 struct Rational(T)if(isLikeBuiltInInt!T){
-private:
+  private:
     T _num;             //分子
     T _den = 1;         //分母
 
@@ -276,7 +276,7 @@ private:
     }
 
     
-public:
+  public:
 
   version(none){
     static typeof(this) init() @property pure nothrow @safe {
@@ -732,10 +732,19 @@ public:
     }
 
 
+  static if(is(T == BigInt))
+  {
     ///ditto
-    U opCast(U : T)() const {
-        return cast()_num / cast()_den;
+    U opCast(U : T)() {
+        return _num / _den;
     }
+  }
+  else
+  {
+    U opCast(U : T)() const {
+        return _num / _den;
+    }
+  }
 
 
     U opCast(U)() pure nothrow @safe const if(isRationalType!U && is(typeof({auto e = U(_num, _den);}))){
@@ -897,37 +906,33 @@ public:
     }
 
 
-    auto opCmp(U)(auto ref const U r) const if(!isRationalType!U){
-        static if(is(typeof(_num - r * _den)))
-            return _num - r * _den;
-        else
-            return (cast()_num) - (cast()r) * (cast()_den);
+    auto opCmp(U)(auto ref U r) if(!isRationalType!U)
+    {
+        return _num - r * _den;
     }
 
 
-    auto opCmp(U)(auto ref const Rational!U r) const {
-        static if(is(typeof({auto _gcd = gcd(_den, r._den);}))){
+    auto opCmp(U)(auto ref Rational!U r)
+    {
             auto _gcd = gcd(_den, r._den);
             return (_num * (r._den / _gcd)) - (r._num * (_den / _gcd));
-        }
-        else{
-            auto _gcd = gcd(cast()_den, cast()r._den);
-            return ((cast()_num) * ((cast()r._den) / _gcd)) - ((cast()r._num) * ((cast()_den) / _gcd));
-        }
     }
 
 
-    bool opEquals(U)(auto ref const U v) const if(!isRationalType!U){
+    bool opEquals(U)(auto ref U v) if(!isRationalType!U)
+    {
         return _den == 1 && _num == v;
     }
 
 
-    bool opEquals(U)(auto ref const Rational!U r) const {
+    bool opEquals(U)(auto ref const Rational!U r)
+    {
         return (_num == r._num) && (_den == r._den);
     }
 
 
-    void toString(scope void delegate(const(char)[]) sink, FormatSpec!char fmt) const {
+    void toString(scope void delegate(const(char)[]) sink, FormatSpec!char fmt)
+    {
         if(fmt.nested.length != 0){
             formattedWrite(sink, fmt.nested, _num, _den);
         }else{
@@ -1273,7 +1278,7 @@ unittest{   //BigInt test
     assert(r1 == 729);
     assert(r1 == BigInt(729));
     assert(r1 <= BigInt(729));
-    assert(!(r1 < r(729)));
+    assert(r1 !< r(729));
     assert(r1 < r(700*8, 3));
     assert(r1 > r(700*2, 3));
 
