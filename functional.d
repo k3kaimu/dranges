@@ -19,6 +19,7 @@ import std.algorithm,
        std.bigint,
        std.conv,
        std.exception,
+       std.format,
        std.functional,
        std.math,
        std.metastrings,
@@ -661,7 +662,7 @@ template mapper(alias fun)
         }
         else    // args as array
         {
-            alias typeof(fun(T[0][0].init)) RT;
+            alias typeof(fun(args[0][0])) RT;
             RT[] result = new RT[args[0].length];
             foreach(i,arg; args[0]) result[i] = fun(arg);
             return result;
