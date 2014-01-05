@@ -1564,25 +1564,53 @@ assert(nbar == 1);
 ----
 */
 
-template naryFun(alias fun) if(is(typeof(fun) == string)){
-    auto ref naryFun(T...)(auto ref T args)
+template naryFun(alias fun)
+if(is(typeof(fun) == string))
+{
+    auto ref naryFunAlphabet(T...)(auto ref T args)
     {
         static assert(T.length <= 26);
-        mixin(createAlias(T.length));
+        mixin(createAliasAlphabet(T.length));
         return mixin(fun);
     }
     
-    import std.conv : to;
     
-    string createAlias(uint Nparam){
-        string dst;
-        foreach(i; 0..Nparam)
-            dst ~= "alias args[" ~ to!string(i) ~ "] " ~ cast(immutable(char))(i + 'a') ~ ";\n";
-        return dst;
+    auto ref naryFunNumber(T...)(auto ref T args)
+    {
+        mixin(createAliasNumber(T.length));
+        return mixin(fun);
+    }
+
+
+    auto ref naryFun(T...)(auto ref T args)
+    {
+      static if(is(typeof({naryFunNumber(forward!args);})))
+        return naryFunNumber(forward!args);
+      else
+        return naryFunAlphabet(forward!args);
+    }
+
+
+    string createAliasAlphabet(size_t nparam){
+        auto app = appender!string();
+        foreach(i; 0 .. nparam)
+            app.formattedWrite("alias %s = args[%s];\n", cast(char)(i + 'a'), i);
+        return app.data;
+    }
+
+
+    string createAliasNumber(size_t nparam)
+    {
+        auto app = appender!string();
+        foreach(i; 0 .. nparam)
+            app.formattedWrite("alias _%1$s = args[%1$s];\n", i);
+        return app.data;
     }
 }
 
-template naryFun(alias fun) if(!is(typeof(fun) == string))
+/// ditto
+template naryFun(alias fun)
+if(!is(typeof(fun) == string))
 {
     alias fun naryFun;
 }
@@ -1595,6 +1623,10 @@ unittest
     alias naryFun!("a+b*c-d") test4;    // Creates a templated 4-args function test4(A, B, C, D)(A a, B b, C c, D d) { return a+b*c-d;}
     assert(test4(1,2,3,4) == 3);        // instantiate test4!(int, int, int, int)
     assert(test4(1.0,2.0,3,4) == 3.0);   // instantiate test4!(double, double, int, int)
+
+    alias naryFun!("_0+_1*_2-_3") test4n;
+    assert(test4n(1, 2, 3, 4) == 3);
+    assert(test4n(1.0, 2.0, 3, 4) == 3.0);
 
     alias naryFun!"a+b" test3;      // You can create a fun with more args than necessary, if you wish
     assert(test3(1,2,100) == 3);        // without the 3, naryFun!"a+b" would create a binary function.
@@ -1616,7 +1648,7 @@ unittest
     
     alias naryFun!"3" test0;               // A 0-arg function. It's exactly: int test0() { return 3;}
     assert(test0 == 3);                    // Constant return
-    static assert(is(typeof(test0!()) == function)); // But it's a function, not a constant.
+    assert(test0() == 3);                   // But it's a function, not a constant.
 
     int foo(int a, int b) { return a*b;}
     alias naryFun!(foo) nfoo;           // function test
