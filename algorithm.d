@@ -2499,7 +2499,7 @@ unittest
     auto s13 = select([false, true,false,true][], r);
     assert(equal(s13, [1,3][]));
 }
-/+
+
 /**
 Lazily returns all subranges of a range: the ranges created
 by taking only some elements of the range in the same order.
@@ -2566,7 +2566,7 @@ unittest
     int[][] witness = [[], [0], [1], [0,1], [2], [0,2], [1,2], [0,1,2]];
     
     foreach(elem; sr) {
-        pragma(msg, "bug : ", __FILE__, " : ", __LINE__);
+        //pragma(msg, "bug : ", __FILE__, " : ", __LINE__);
         assert(equal(elem, witness.front));
         witness.popFront;
     }
@@ -2577,15 +2577,15 @@ unittest
     sre.popFront;
     assert(sre.empty);
 }
-+/
-/+ strange error with isInfinite on subranges...
+
+
 /**
 Returns the variations of a range: the permutations of all subranges (including the range itself).
 Example:
 ----
 auto r = [0,1,2];
 auto v = variations(r);
-assert(equal(v, [  [],   /+ empty range +/
+assert(equal(v, [  [],   // empty range
                    [0],
                    [1],
                    [0,1], [1,0],
@@ -2596,34 +2596,34 @@ assert(equal(v, [  [],   /+ empty range +/
                 ][]));
 ----
 */
-Variations!R variations(R)(R range) if (isForwardRange!R)
+auto variations(R)(R range) if (isForwardRange!R)
 {
     return flatMap!permutations(subranges(range));
 }
 
 template Variations(R) if (isForwardRange!R)
 {
-    alias Concat!(Map!(permutations, Unfold2!(nextSub!R, endSubRange!R, bool[], R))) Variations;
+    alias Variations = typeof(variations(R.init));
 }
 
 unittest
 {
-    auto r = [0,1];
+    auto r = [0, 1, 2];
     auto v = variations(r);
-//    assert(equal(v, [  [],   /+ empty range +/
-//                       [0],
-//                       [1],
-//                       [0,1], [1,0],
-//                       [2],
-//                       [0,2], [2,0],
-//                       [1,2], [2,1],
-//                       [0,1,2], [1,2,0], [2,0,1], [1,0,2], [0,2,1], [2,1,0]
-//                    ][]));
+    assert(equal(v, [  [],   /// empty range
+                       [0],
+                       [1],
+                       [0,1], [1,0],
+                       [2],
+                       [0,2], [2,0],
+                       [1,2], [2,1],
+                       [0,1,2], [1,2,0], [2,0,1], [1,0,2], [0,2,1], [2,1,0]
+                    ][]));
 
-//    int[] e;
-//    assert(equal(variations(e), [e][]));
+    int[] e;
+    assert(equal(variations(e), [e][]));
 }
-+/
+
 
 /**
 std.algorithm.sort does an efficient in-place sort, but it requires the
