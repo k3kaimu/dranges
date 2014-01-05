@@ -13,8 +13,8 @@ Distributed under the Boost Software License, Version 1.0.
 module dranges.treerange;
 
 import std.array,
-       std.metastrings,
-       std.range;
+       std.range,
+       std.string;
 
 import dranges.functional : naryFun;
 
@@ -149,7 +149,7 @@ T max(T)(Tree!T tr) { return reduceTree!"max(a,b,c)"(T.min, tr);}
 /// ditto
 T min(T)(Tree!T tr) { return reduceTree!"min(a,b,c)"(T.max, tr);}
 /// ditto
-I opTree(string op, I, T)(I ifNull, Tree!T tr) { return reduceTree!(Format!("a %s b %s c", op,op))(ifNull, tr);}
+I opTree(string op, I, T)(I ifNull, Tree!T tr) { return reduceTree!(format("a %s b %s c", op,op))(ifNull, tr);}
 
 unittest
 {

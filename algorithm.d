@@ -1262,7 +1262,7 @@ assert(powersOf!2[10] == 1024); // opIndex is defined
 // Converging on a value
 // (x+n/x)/2 applied repeatedly converges towards sqrt(n)
 auto sqrtOf(size_t n)() {
-    return iterate!Format("(a + %s/a)/2", n)(1.0);
+    return iterate!(format("(a + %s/a)/2", n))(1.0);
 }
 auto sqrt2 = sqrtOf!2; // Converges towards sqrt(2), 1.414
 popFrontN(sqrt2, 4); // letting it converge
@@ -1331,7 +1331,7 @@ unittest
     // Converging on a value
     // (x+n/x)/2 applied repeatedly converges towards sqrt(n)
     auto sqrtOf(size_t n)() {
-        return iterate!(Format!("(a+%s/a)/2", n))(1.0);
+        return iterate!(format("(a+%s/a)/2", n))(1.0);
     }
     auto sqrt2 = sqrtOf!2; // Converges towards sqrt(2), 1.414
     popFrontN(sqrt2, 4); // letting is converge

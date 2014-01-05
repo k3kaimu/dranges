@@ -4187,11 +4187,11 @@ Stutter!(R) stutter(R)(uint n, R range)
 /**
 Another version, based on flatMap.
 ----
-flatMap!(Format!("array(repeat(a, %s))", n))(r);
+flatMap!(format("array(repeat(a, %s))", n))(r);
 ----
 It's a one-liner, but it's a forward range, no more (no opIndex, back, etc)
 */
-Concat!(Map!(unaryFun!(Format!("array(repeat(a, %s))", n)), R)) stutter2(size_t n, R)(R r) if (isForwardRange!R)
+Concat!(Map!(unaryFun!(format("array(repeat(a, %s))", n)), R)) stutter2(size_t n, R)(R r) if (isForwardRange!R)
 {
     return flatMap!(Format!("array(repeat(a, %s))", n))(r);
 }

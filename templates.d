@@ -73,8 +73,8 @@ template staticSwitch( alias F, T... ) if ( allSatisfy!( isAlias, T ) ) {
    auto With( CommonType!T index, ParameterTypeTuple!( F!( T[0] ) ) args ) {
        switch ( index ) {
            foreach ( i, e; T ) {
-               mixin( Format!( q{case %s:}, e ) );
-               return F!( e )( args );
+                mixin(`case ` ~ e.stringof ~ `: return F!(e)(args);`);
+                //return F!( e )( args );
            }
            default:
                 assert(false);
@@ -923,7 +923,7 @@ Example:
 // Different predicate strings based on value's type.
 alias SwitchOnType!(value,
                     char,    "a.field[1] == '" ~ value ~ "'",         /+ Incorrect if value is an int +/
-                    string,  Format!("a.field[1] == \"%s\" ", value), /+ Incorrect if value is a char +/
+                    string,  format("a.field[1] == \"%s\" ", value), /+ Incorrect if value is a char +/
                     Default, "a.field[1] == " ~ to!string(value)
                     ) predicate;
 ----
