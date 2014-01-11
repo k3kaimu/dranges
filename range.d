@@ -5164,6 +5164,284 @@ unittest
 
 
 /**
+memozied
+*/
+auto memoized(Range)(Range range, size_t size = 4096)
+if(isInputRange!Range)
+{
+  static if(isArray!Range)
+    return range;
+  else
+  {
+    alias R = Unqual!Range;
+    alias E = ElementType!R;
+    alias Handle = size_t;
+
+    static struct Memo()
+    {
+      private:
+        R _range;
+
+      static if(hasLvalueElements!R)
+        E*[] _buf;
+      else
+        E[] _buf;
+
+        size_t[] _posOfHandle;
+
+
+        auto ref minIdx() @property pure nothrow @safe inout
+        {
+            return _posOfHandle[0];
+        }
+
+
+        auto ref endIdx() @property pure nothrow @safe inout
+        {
+            return _posOfHandle[1];
+        }
+
+
+        Handle getNewHandle(size_t pos) pure nothrow @safe
+        in{
+            assert(pos >= this.minIdx);
+            assert(pos <= this.endIdx);
+        }
+        body{
+            foreach(i, ref e; _posOfHandle[2 .. $])
+                if(!e){
+                    e = pos;
+                    return i + 2;
+                }
+
+            _posOfHandle ~= pos;
+            return _posOfHandle.length - 1;
+        }
+
+
+        //ハンドルhを受け取って、それの子供となるものを返します。
+        Handle getNewChild(Handle h) pure nothrow @safe
+        in{
+            assert(h >= 2);
+            assert(h < _posOfHandle.length);
+        }
+        body{
+            return getNewHandle(_posOfHandle[h]);
+        }
+
+
+        void reSlicing() pure nothrow @safe
+        {
+            size_t minIdx = this.minIdx, maxIdx = this.endIdx - 1;
+            foreach(e; _posOfHandle[2 .. $]){
+                if(e)
+                    minIdx = min(e, minIdx);
+
+                maxIdx = max(e, maxIdx);
+            }
+
+            this.minIdx = minIdx;
+            this.endIdx = maxIdx + 1;
+        }
+
+
+        ///ハンドルhを受け取り、そのハンドルを無効化します。
+        void releaseHandle(Handle h) pure @safe @safe
+        in{
+            assert(h >= 2);
+            assert(h < _posOfHandle.length);
+        }
+        body{
+            immutable cpos = _posOfHandle[h];
+            _posOfHandle[h] = 0;
+
+            if(cpos == this.minIdx)
+                reSlicing();
+        }
+
+
+        auto ref getValue(Handle h) pure @safe nothrow inout
+        in{
+            assert(h >= 2);
+            assert(h < _posOfHandle.length);
+        }
+        body{
+          static if(hasLvalueElements!R)
+            return *(_buf[_posOfHandle[h] % _buf.length]);
+          else
+            return cast(E)_buf[_posOfHandle[h] % _buf.length]; // to rvalue
+        }
+
+
+        bool isEmpty(Handle h)
+        in{
+            assert(h >= 2);
+            assert(h < _posOfHandle.length);
+        }
+        body{
+            return _posOfHandle[h] >= this.endIdx && _range.empty;
+        }
+
+
+        void popFrontN(Handle h, size_t n)
+        in{
+            assert(h >= 2);
+            assert(h < _posOfHandle.length);
+        }
+        body{
+            //writefln("{%s(%s)}hs : %s, h : %s", __FILE__, __LINE__, _posOfHandle, h);
+
+            if(!n)
+                return;
+            else if((_posOfHandle[h] + n) < this.endIdx)
+            {
+                immutable cpos = _posOfHandle[h];
+                _posOfHandle[h] += n;
+
+                if(cpos == this.minIdx)
+                    reSlicing();
+            }
+            else
+            {
+                immutable remN = this.endIdx - _posOfHandle[h] - 1;
+                this.popFrontN(h, remN);
+                n -= remN;
+
+                _posOfHandle[h] += n;
+                if(_posOfHandle[h] - this.minIdx >= _buf.length){
+                    _buf.length <<= 1;
+                    _buf[$>>1 .. $][] = _buf[0 .. $>>1];
+                }
+
+                while(this.endIdx <= _posOfHandle[h] && !_range.empty){
+                    _buf[this.endIdx % _buf.length] = _range.front;
+                    _range.popFront();
+                    ++this.endIdx;
+                }
+            }
+        }
+
+
+      static if(hasLength!R)
+        size_t length(Handle h)
+        {
+            return _range.length + (this.endIdx - _posOfHandle[h]);
+        }
+    }
+
+    static struct Result()
+    {
+        this(this) pure nothrow @safe
+        {
+            _h = _memo.getNewChild(_h);
+        }
+
+
+        ~this() pure nothrow @safe
+        {
+            if(_h && _memo)
+                _memo.releaseHandle(_h);
+        }
+
+
+        void opAssign()(auto ref typeof(this) rhs) pure nothrow @safe
+        {
+            this._memo = rhs._memo;
+            this._h = this._memo.getNewChild(rhs._h);
+        }
+
+
+        auto ref front() @property pure nothrow @safe inout
+        {
+            return _memo.getValue(_h);
+        }
+
+
+        void popFront()
+        {
+            popFrontN(1);
+        }
+
+
+        void popFrontN(size_t n)
+        {
+            _memo.popFrontN(_h, n);
+        }
+
+
+        bool empty() @property
+        {
+            return _memo.isEmpty(_h);
+        }
+
+
+        Result!() save() pure nothrow @safe
+        {
+            return this;
+        }
+
+
+        auto ref opIndex(size_t idx)
+        {
+            auto t = this;
+            t.popFrontN(idx);
+            return t.front;
+        }
+
+
+        auto opSlice() pure nothrow @safe
+        {
+            return this;
+        }
+
+
+        auto opSlice(size_t n, size_t m)
+        in{
+            assert(n <= m);
+        }
+        body{
+            auto t = this;
+            t.popFrontExactly(n);
+            return t.takeExactly(m - n);
+        }
+
+
+      static if(hasLength!R)
+      {
+        size_t length()
+        {
+            return _memo.length(_h);
+        }
+
+
+        alias opDollar = length;
+      }
+
+      private:
+        Memo!()* _memo;
+        Handle _h;
+    }
+
+
+    Result!() dst;
+    dst._memo = new Memo!()(range);
+    dst._memo._buf.length = size;
+    if(!dst._memo._range.empty){
+        dst._memo._buf[1] = dst._memo._range.front;
+        dst._memo._range.popFront();
+        dst._memo._posOfHandle = [1, 2, 1];
+        dst._h = 2;
+    }else{
+        dst._memo._posOfHandle = [1, 1, 1];
+        dst._h = 2;
+    }
+
+    return dst;
+  }
+}
+
+
+/**
 return a forward-range from a input-range.
 
 Example:
@@ -5196,242 +5474,17 @@ assert(equal(sr, [0, 1, 2, 3, 4]));
 
 Authors: Kazuki Komatsu(k3_kaimu)
 */
-template toForwardRange(Range) if(isForwardRange!(Unqual!Range))
+R toForwardRange(R)(R r)
+if(isForwardRange!(Unqual!R))
 {
-    Range toForwardRange(Range r){
-        return r;
-    }
+    return r;
 }
 
 
-///ditto
-template toForwardRange(Range)
-if(!isForwardRange!(Unqual!Range) && isInputRange!(Unqual!Range) )
+auto toForwardRange(R)(R r)
+if(!isForwardRange!(Unqual!R) && isInputRange!(Unqual!R))
 {
-    ///ditto
-    ToForwardRanged toForwardRange(Range r)
-    {
-        return ToForwardRanged(r);
-    }
-
-    alias Unqual!(Range) R;
-    alias ElementType!R E;
-    alias size_t Handle;
-
-    struct ToForwardRanged
-    {
-      private:
-        Buffer* _buffer;
-        Handle _handle;
-
-      public:
-        this(R r)
-        {
-            _buffer = new Buffer(r);
-            _handle = _buffer.getHandle(0);
-        }
-
-
-        this(this) pure nothrow @safe
-        {
-            _handle = _buffer.getNewChild(_handle);
-        }
-
-
-        ~this() pure @safe
-        {
-            _buffer.releaseHandle(_handle);
-            if(_buffer.canDestroy)
-                _buffer.destroy();
-        }
-
-
-        void opAssign(typeof(this) src) pure @safe
-        {
-            if((_buffer !is null))
-                _buffer.releaseHandle(_handle);
-            
-            _buffer = src._buffer;
-            if(_buffer !is null)
-                _handle = _buffer.getNewChild(src._handle);
-        }
-
-
-        @property
-        E front() pure nothrow @safe const
-        {
-            return _buffer.getValue(_handle);
-        }
-
-
-        @property
-        bool empty()pure nothrow @safe const
-        {
-            return _buffer.isEmpty(_handle);
-        }
-
-
-        void popFront()
-        {
-            _buffer.popFront(_handle);
-        }
-
-
-        @property
-        typeof(this) save() pure @safe
-        {
-            typeof(this) dst = this;
-            dst._handle = _buffer.getNewChild(_handle);
-            return dst;
-        }
-
-
-        void detach() pure @safe
-        {
-            _buffer.releaseHandle(_handle);
-            _buffer = null;
-        }
-    }
-
-
-    struct Buffer
-    {
-      private:
-        R _range;
-        E[] _buf;                       //バッファ
-        Tuple!(size_t, size_t) _slice;  //スライス。cycle(_buf)[_slice[0] .. _slice[1]]が範囲
-        size_t[Handle] _idxs;           //各Handleでの現在の位置
-        size_t _emptyPos;               //emptyとなる位置
-
-        void reSlicing() pure @safe
-        {
-            size_t min = _slice[1];
-            foreach(k, v; _idxs){
-                if(v < min)
-                    min = v;
-            }
-
-            _slice[0] = min;
-
-            size_t t = _slice[0] / _buf.length;
-            if(t){
-                _slice[0] -= t * _buf.length;
-                _slice[1] -= t * _buf.length;
-
-                foreach(k, ref v; _idxs)
-                    v -= t * _buf.length;
-            }
-        }
-
-
-      public:
-        this(R range)
-        {
-            _range = range;
-            _buf = new E[1024];
-            _slice = tuple(0, 1);
-
-            if(!_range.empty){
-                _buf[0] = _range.front;
-                _range.popFront();
-                _emptyPos = size_t.max;
-            }else
-                _emptyPos = 0;
-        }
-
-
-        Handle getHandle(size_t pos) pure @safe nothrow
-        in{
-            assert(pos >= _slice[0]);
-            assert(pos < _slice[1]);
-        }
-        body{
-            foreach(k; 0 .. Handle.max)
-                if(k !in _idxs){
-                    _idxs[k] = pos;
-                    return k;
-                }
-            assert(0);
-        }
-
-
-        //ハンドルhを受け取って、それの子供となるものを返します。
-        Handle getNewChild(Handle h) pure nothrow @safe
-        in{
-            assert(h in _idxs);
-        }
-        body
-        {
-            return getHandle(_idxs[h]);
-        }
-
-
-        ///ハンドルhを受け取り、そのハンドルを無効化します。
-        void releaseHandle(Handle h) pure @safe
-        in{
-            assert(h in _idxs);
-        }
-        body
-        {
-            size_t cpos = _idxs[h];
-            _idxs.remove(h);
-
-            if(cpos == _slice[0])
-                reSlicing();
-        }
-
-
-        E getValue(Handle h) pure @safe nothrow const
-        in{
-            assert(h in _idxs);
-        }
-        body
-        {
-            return _buf[_idxs[h] % _buf.length];
-        }
-
-
-        bool isEmpty(Handle h) pure @safe nothrow const
-        in{
-            assert(h in _idxs);
-        }
-        body
-        {
-            return _idxs[h] >= _emptyPos;
-        }
-
-
-        void popFront(Handle h)
-        {
-            size_t cpos = _idxs[h];
-            ++_idxs[h];
-
-            if(cpos == _slice[0])
-                reSlicing();
-
-            if(++cpos == _slice[1]){
-                if((cpos - _slice[0]) == _buf.length){
-                    _buf.length <<= 1;
-                    _buf[$>>1 .. $][] = _buf[0 .. $>>1][];
-                }
-
-                if(!_range.empty){
-                    _buf[_slice[1] % _buf.length] = _range.front;
-                    _range.popFront;
-                    ++_slice[1];
-                }else
-                    _emptyPos = _slice[1];
-            }
-        }
-
-
-        bool canDestroy() pure @safe @property const
-        {
-            foreach(k, v; _idxs)
-                return false;
-            return true;
-        }
-    }
+    return r.memoized;
 }
 
 unittest{
@@ -5455,6 +5508,8 @@ unittest{
         bool empty(){return (_l <= *_f);}
 
         void popFront(){*_f += 1;}
+
+        size_t length() @property { return _l - *_f; }
     }
 
 
@@ -5462,6 +5517,7 @@ unittest{
     auto sr = toForwardRange(r);
     assert(equal(sr.save, [0, 1, 2, 3, 4]));
     assert(equal(sr, [0, 1, 2, 3, 4]));
+    assert(sr.length == 5);
 
     auto r2 = IRange(4096);
     auto sr1 = toForwardRange(r2);
@@ -5511,9 +5567,18 @@ unittest{
 
     auto r41 = toForwardRange(r4);
     auto r42 = r41;
-
     assert(r41.empty);
     assert(r42.empty);
+
+    auto r5 = IRange(1024).toForwardRange();
+    assert(equal(r5[0 .. 5], r5[0 .. 5]));
+    assert(r5[0 .. 5].length == 5);
+    assert(equal(r5[10 .. 1024], r5[10 .. 1024]));
+    assert(r5[10 .. 1024].length == 1024 - 10);
+
+    assert(equal(r5[512 .. 1024], r5[$/2 .. $]));
+    assert(r5[0 .. 0].empty);
+    assert(r5[$ .. $].empty);
 }
 
 
