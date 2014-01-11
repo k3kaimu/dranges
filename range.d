@@ -5289,8 +5289,6 @@ if(isInputRange!Range)
             assert(h < _posOfHandle.length);
         }
         body{
-            //writefln("{%s(%s)}hs : %s, h : %s", __FILE__, __LINE__, _posOfHandle, h);
-
             if(!n)
                 return;
             else if((_posOfHandle[h] + n) < this.endIdx)
@@ -5368,11 +5366,14 @@ if(isInputRange!Range)
             _memo.popFrontN(_h, n);
         }
 
-
+      static if(isInfinite!R)
+        enum empty = false;
+      else
         bool empty() @property
         {
             return _memo.isEmpty(_h);
         }
+
 
 
         Result!() save() pure nothrow @safe
