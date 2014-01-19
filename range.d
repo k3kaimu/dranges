@@ -5283,14 +5283,16 @@ if(isInputRange!Range)
         }
 
 
-        void popFrontN(Handle h, size_t n)
+        size_t popFrontN(Handle h, size_t n)
         in{
             assert(h >= 2);
             assert(h < _posOfHandle.length);
         }
         body{
+            immutable beforePos = _posOfHandle[h];
+
             if(!n)
-                return;
+                return 0;
             else if((_posOfHandle[h] + n) < this.endIdx)
             {
                 immutable cpos = _posOfHandle[h];
@@ -5298,15 +5300,18 @@ if(isInputRange!Range)
 
                 if(cpos == this.minIdx)
                     reSlicing();
+
+                return n;
             }
             else
             {
                 immutable remN = this.endIdx - _posOfHandle[h] - 1;
-                this.popFrontN(h, remN);
-                n -= remN;
+                size_t ret = this.popFrontN(h, remN);
+                assert(_posOfHandle[h] == this.endIdx - 1);
 
+                n -= remN;
                 _posOfHandle[h] += n;
-                if(_posOfHandle[h] - this.minIdx >= _buf.length){
+                while(_posOfHandle[h] - this.minIdx >= _buf.length){
                     _buf.length <<= 1;
                     _buf[$>>1 .. $][] = _buf[0 .. $>>1];
                 }
@@ -5314,8 +5319,14 @@ if(isInputRange!Range)
                 while(this.endIdx <= _posOfHandle[h] && !_range.empty){
                     _buf[this.endIdx % _buf.length] = _range.front;
                     _range.popFront();
+                    ++ret;
                     ++this.endIdx;
                 }
+
+                if(_posOfHandle[h] > this.endIdx)
+                    _posOfHandle[h] = this.endIdx;
+
+                return ret;
             }
         }
 
@@ -5361,9 +5372,9 @@ if(isInputRange!Range)
         }
 
 
-        void popFrontN(size_t n)
+        size_t popFrontN(size_t n)
         {
-            _memo.popFrontN(_h, n);
+            return _memo.popFrontN(_h, n);
         }
 
       static if(isInfinite!R)
@@ -5425,7 +5436,9 @@ if(isInputRange!Range)
 
 
     Result!() dst;
-    dst._memo = new Memo!()(range);
+    //dst._memo = new Memo!()(range);
+    dst._memo = new Memo!();
+    dst._memo._range = range;
     dst._memo._buf.length = size;
     if(!dst._memo._range.empty){
         dst._memo._buf[1] = dst._memo._range.front;
@@ -5515,13 +5528,13 @@ unittest{
 
 
     auto r = IRange(5);
-    auto sr = toForwardRange(r);
+    auto sr = memoized(r);
     assert(equal(sr.save, [0, 1, 2, 3, 4]));
     assert(equal(sr, [0, 1, 2, 3, 4]));
     assert(sr.length == 5);
 
     auto r2 = IRange(4096);
-    auto sr1 = toForwardRange(r2);
+    auto sr1 = memoized(r2);
 
     auto sr2 = sr1.save;//save
     auto sr3 = sr2;     //this(this)
@@ -5537,25 +5550,41 @@ unittest{
     assert(equal(sr4, arr));
 
     auto r3 = IRange(4096);
-    auto r31 = toForwardRange(r3);
+    auto r31 = memoized(r3, 1024);
     auto r32 = r31.save;
     auto r33 = r32;
     typeof(r33) r34;
     r34 = r33;
 
-    r31.popFrontN(2048);
+    assert(r31.popFrontN(2048) == 2048);
     assert(equal(r32, arr));
     assert(equal(r33, arr));
     assert(equal(r34, arr));
 
-    r31.popFrontN(1024);
+    assert(r31.popFrontN(1024) == 1024);
     assert(equal(r32, arr));
     assert(equal(r33, arr));
     assert(equal(r34, arr));
 
-    r32.popFrontN(2048 + 1024);
-    r33.popFrontN(2048 + 1024);
-    r34.popFrontN(2048 + 1024);
+    assert(r32.popFrontN(2048 + 1024) == 3072);
+    assert(r33.popFrontN(2048 + 1024) == 3072);
+    assert(r34.popFrontN(2048 + 1024) == 3072);
+    assert(equal(r31, r32));
+    assert(equal(r32, r33));
+    assert(equal(r33, r34));
+
+    assert(r31.popFrontN(10) == 10);
+    assert(r32.popFrontN(10) == 10);
+    assert(r33.popFrontN(10) == 10);
+    assert(r34.popFrontN(10) == 10);
+    assert(equal(r31, r32));
+    assert(equal(r32, r33));
+    assert(equal(r33, r34));
+
+    assert(r31.popFrontN(1024) == 1023-10);     // 1023 : 1024 - 1(first-0)
+    assert(r32.popFrontN(1024) == 1023-10);
+    assert(r33.popFrontN(1024) == 1023-10);
+    assert(r34.popFrontN(1024) == 1023-10);
     assert(equal(r31, r32));
     assert(equal(r32, r33));
     assert(equal(r33, r34));
@@ -5566,12 +5595,12 @@ unittest{
     auto r4 = IRange(0);
     assert(r4.empty);
 
-    auto r41 = toForwardRange(r4);
+    auto r41 = memoized(r4);
     auto r42 = r41;
     assert(r41.empty);
     assert(r42.empty);
 
-    auto r5 = IRange(1024).toForwardRange();
+    auto r5 = IRange(1024).memoized();
     assert(equal(r5[0 .. 5], r5[0 .. 5]));
     assert(r5[0 .. 5].length == 5);
     assert(equal(r5[10 .. 1024], r5[10 .. 1024]));
