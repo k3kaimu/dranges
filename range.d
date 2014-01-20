@@ -5075,6 +5075,87 @@ unittest
 }
 
 
+
+/**
+return to the range separated by pred.
+
+Authors: Kazuki Komatsu(k3_kaimu)
+*/
+auto splitBy(alias fun, R)(R range)
+if(isForwardRange!R)
+{
+    static struct Result()
+    {
+        bool empty() @property
+        {
+            return _range.empty;
+        }
+
+
+        @property
+        auto front()
+        {
+            return _range.save.take(_n+1);
+        }
+
+
+        void popFront()
+        {
+            _range.popFrontN(_n+1);
+            _n = _range.countUntil!fun();
+            if(_n < 0)
+                _n = ptrdiff_t.max - 1;
+        }
+
+
+        auto save() @property
+        {
+            auto dst = this;
+            dst._range = dst._range.save;
+            return dst;
+        }
+
+
+      private:
+        R _range;
+        ptrdiff_t _n;
+    }
+
+    auto dst = Result!()(range, -1);
+    dst.popFront();
+    return dst;
+}
+
+///
+unittest{
+    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+
+    int[] a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    auto sna = splitBy!"(a+1)%3 == 0"(a);
+    assert(equal(sna, [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10]]));
+    
+    
+    int[] b = a[0 .. 9];
+    auto snb = splitBy!"(a+1)%3 == 0"(b);
+    assert(equal(snb, [[0, 1, 2], [3, 4, 5], [6, 7, 8]]));
+
+
+    int[] c = [];
+    auto snc = splitBy!"false"(c);
+    assert(snc.empty);
+
+    auto snd = splitBy!"true"(c);
+    assert(snc.empty);
+
+    auto sne = splitBy!"true"(a);
+    assert(equal(sne, [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10]]));
+
+    auto snf = splitBy!"false"(a);
+    assert(equal(snf, [a]));
+}
+
+
 /**
 return the range with the element that receives the range in which the elements are ubyte value,
 was converted to the type T as a binary
