@@ -4924,30 +4924,6 @@ Store!R store(R)(R range) if (isInputRange!R)
 /**
 return to the range separated by n elements as array.
 
-Example:
-------
-int[] a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-auto sn = splitN(a, 3);
-assert(equal(sn, [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10]]));
-
-assert(sn[0] == [0, 1, 2]);
-assert(sn[1] == [3, 4, 5]);
-assert(sn[2] == [6, 7, 8]);
-assert(sn[3] == [9, 10]);
-
-assert(sn.length == 4);
-
-
-int[] b = a[0..9];
-auto snb = splitN(b, 3);
-assert(equal(snb, [[0, 1, 2], [3, 4, 5], [6, 7, 8]]));
-
-assert(snb[0] == [0, 1, 2]);
-assert(snb[1] == [3, 4, 5]);
-assert(snb[2] == [6, 7, 8]);
-assert(snb.length == 3);
-------
-
 Authors: Kazuki Komatsu(k3_kaimu)
 */
 SplitN!R splitN(R)(R range, size_t n)
@@ -4958,15 +4934,15 @@ SplitN!R splitN(R)(R range, size_t n)
 
 ///ditto
 struct SplitN(Range)
-if(isInputRange!(Unqual!(Range)))
+if(isForwardRange!(Unqual!(Range)))
 {
     alias Unqual!Range R;
 
-private:
+  private:
     R _input;
     size_t _n;
 
-public:    
+  public:    
     ///
     this(R input, size_t n) pure nothrow @safe{
         _input = input;
@@ -4994,7 +4970,7 @@ public:
     ///ditto
     @property
     auto front(){
-        return take(_input, _n);
+        return take(_input.save, _n);
     }
 
     
@@ -5037,6 +5013,7 @@ public:
   }
 }
 
+///
 unittest
 {
     scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
