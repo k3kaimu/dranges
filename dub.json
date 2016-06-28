@@ -1,0 +1,14 @@
+{
+    "name": "dranges",
+    "description": "some utility library for D.",
+    "authors": ["Kazuki Komatsu"],
+    "homepage": "https://github.com/k3kaimu/dranges",
+    "license": "NYSL",
+    "copyright": "Copyright © 2016, Kazuki Komatsu",
+
+    "importPaths": ["source"],
+    "targetType": "library",
+
+    "dependencies": {
+    }
+}

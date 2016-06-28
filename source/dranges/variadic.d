@@ -116,8 +116,8 @@ template Min(alias a, Rest...) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     assert(Max!1 == 1);
     assert(Max!(1,2) == 2);

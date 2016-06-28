@@ -28,7 +28,7 @@ import std.algorithm,
        std.exception,
        std.functional,
        std.math,
-       std.metastrings,
+       //std.metastrings,
        std.range,
        std.stdio,
        std.string,
@@ -44,23 +44,23 @@ import dranges.functional,
        dranges.traits,
        dranges.typetuple;
 
-/**
-Small one-liners to use reduce. Sum and product work on empty ranges (they return 0 and 1, respectively),
-but not minOf and maxOf.
-Example:
-----
-auto r1 = [1,2,3,4,5];
-auto r2 = [-1.0,2.7818281828, 3.1415926];
+///**
+//Small one-liners to use reduce. Sum and product work on empty ranges (they return 0 and 1, respectively),
+//but not minOf and maxOf.
+//Example:
+//----
+//auto r1 = [1,2,3,4,5];
+//auto r2 = [-1.0,2.7818281828, 3.1415926];
 
-assert(sum(r1) == 1+2+3+4+5);
-assert(product(r1) == 1*2*3*4*5);
-assert(minOf(r2) == -1.0);
-assert(maxOf(r2) == 3.1415926);
-----
-*/
-ElementType!R sum(R)(R range) if (isInputRange!R) {
-    return reduce!"a+b"(to!(ElementType!R)(0), range);
-}
+//assert(sum(r1) == 1+2+3+4+5);
+//assert(product(r1) == 1*2*3*4*5);
+//assert(minOf(r2) == -1.0);
+//assert(maxOf(r2) == 3.1415926);
+//----
+//*/
+//ElementType!R sum(R)(R range) if (isInputRange!R) {
+//    return reduce!"a+b"(to!(ElementType!R)(0), range);
+//}
 
 /// ditto
 ElementType!R product(R)(R range) if (isInputRange!R) {
@@ -70,7 +70,11 @@ ElementType!R product(R)(R range) if (isInputRange!R) {
 /// ditto
 ElementType!R maxOf(R)(R range) if (isForwardRange!R) {
     enforce(!range.empty, "Do not use maxOf on empty ranges.");
-    return reduce!(std.algorithm.max)((ElementType!R).min, range);
+
+    static if(is(typeof((ElementType!R).min_normal)))
+        return reduce!(std.algorithm.max)((ElementType!R).min_normal, range);
+    else
+        return reduce!(std.algorithm.max)((ElementType!R).min, range);
 }
 
 /// ditto
@@ -81,8 +85,8 @@ ElementType!R minOf(R)(R range) if (isForwardRange!R) {
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
     
     auto r1 = [1,2,3,4,5];
     auto r2 = [-1.0,2.7818281828, 3.1415926];
@@ -118,8 +122,8 @@ size_t[ElementType!R] frequency(R)(R range) if (isInputRange!R)
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = "Mississippi";
     auto f = frequency(r);
@@ -164,8 +168,8 @@ template NMapType(alias fun, R)
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5,6];
     auto nm1 = nmap!"a*b"(r1); // Will map "a*b" on (0,1), (1,2), (2,3), (3,4), (4,5), (5,6)
@@ -242,14 +246,15 @@ template tmap(fun...)if(fun.length >= 1){
     
     auto tmap(T...)(T args)if(T.length > 1 || (T.length == 1 && !__traits(compiles, ElementType!(T[0]).Types)))
     {
-        static if(is(typeof(TMap!(staticMap!(Unqual, T))(args))))
+        /*
+        static if(is(typeof(TMap!(staticMap!(Unqual, T))(args))))*/
             return TMap!(staticMap!(Unqual, T))(args);
-        else{
+        /*else{
             //static assert(fun.length == 1);
             //alias InlineTemplate!("alias f", `auto IT(T...)(Tuple!T e){return naryFun!(f)(e.field);}`) nf;
             return map!(staticMap!(Prepare, staticMap!(naryFun, fun)))(knit(args));
             //return map!(Prepare!(fun[0]))(knit(args));
-        }
+        }*/
     }
 
     
@@ -327,7 +332,7 @@ template tmap(fun...)if(fun.length >= 1){
                 alias TypeTuple!() ETSImpl;
         }
         
-        static assert(__traits(compiles, _fun(ETS.init)));
+        //static assert(__traits(compiles, _fun(ETS.init)));
 
         
         this(T input)
@@ -531,8 +536,8 @@ template tmap(alias fun, R...)
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [1,2,3,4,5,6];
     auto s = "abcdefghijk".dup;
@@ -543,7 +548,7 @@ unittest
     assert(equal(tm2, "_b_d_f"));
 
     auto tm3 = tmap!"a%2==0 ? b : c"(r1,s,concat(tm1));
-    assert(equal(tm3, "abbdcf"));
+    assert(equal(tm3.array(), "abbdcf"));
 
     string e = "";
     assert(tmap!"a"(r1, s, e).empty); // e is empty -> tmap also
@@ -619,8 +624,8 @@ if(__traits(compiles, nfilter!(fun, step)(R.init)))
 unittest
 {
     import std.stdio;
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,3,5,4,3,2,1,0];
     int foo(int a, int b, int c) { return a<=b && b<=c;} // increase on three elements
@@ -1002,8 +1007,8 @@ if(__traits(compiles, tfilter!fun(R.init)))
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto    r1 = [ 0,   1,   2,   3,   4,   5];
     auto r2 = [ 3.0, 4.0, 5.0, 6.0];
@@ -1186,8 +1191,8 @@ public:
 
 unittest // taken from std.algorithm.reduce unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto a = [ 3, 4 ];
     auto r = reduce!("a + b")(0, a);
@@ -1315,8 +1320,8 @@ version(unittest)
 }
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     // Generating the natural numbers
     auto natural = iterate!"a+1"(1);    // 1,2,3,4,5, (as ints)
@@ -1440,8 +1445,8 @@ Scan!(fun, ElementType!R, R) scan(alias fun, R)(R range) if (/*isForwardRange*/i
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     // moving sum
     auto r1 = [1,2,3,4];
@@ -1609,8 +1614,8 @@ ScanR!(fun, ElementType!R, R) scanR(alias fun, R)(R range) if (isBidirectionalRa
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [1,2,3,4];
     auto s = scanR!"a+b"(0,r1); // moving sum
@@ -1765,8 +1770,8 @@ Concat!(typeof(map!fun(R.init))) flatMap(alias fun, R)(R range) {
 }
 
 unittest {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     string text = "this is just a test.\nI mean, I have no idea\nif this will work.";
     auto lines = splitLines(text);
@@ -1925,8 +1930,8 @@ Tuple!(int, real) toCF(real d) { return tuple(to!int(floor(d)), 1.0 / (d - trunc
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     // Generating Fibonacci numbers
     auto fibs = unfold!"tuple(a,b,a+b)"(0,1);
@@ -2020,20 +2025,21 @@ assert(equal(cf, [3,4,12,3,1][])); // ends with 3,1 => 3+1/1 (ie. 4)
 */
 struct Unfold2(alias fun, alias pred, T...)
 {
-    alias naryFun!fun nfun; // string preparation
-    static if (__traits(compiles, nfun!T)) // Can I instantiate nfun!T?
-        alias nfun!T infun;  // instantiates n-fun.
-    else
-        alias nfun infun;    // It's a function, do nothing.
+    //alias naryFun!fun nfun; // string preparation
+    //static if (__traits(compiles, nfun!T)) // Can I instantiate nfun!T?
+    //    alias nfun!T infun;  // instantiates n-fun.
+    //else
+    //    alias nfun infun;    // It's a function, do nothing.
 
-    alias ReturnType!infun Tup; // fun must return a Tuple!(FrontValue, T...)
+    //alias ReturnType!infun Tup; // fun must return a Tuple!(FrontValue, T...)
+    alias Tup = typeof(naryFun!fun(T.init));
     Tup _state;
 
-    this(Tup.Types[1..$] initialParameters) { _state = infun(initialParameters);}
+    this(Tup.Types[1..$] initialParameters) { _state = naryFun!fun(initialParameters);}
     @property bool empty() { return Prepare!(pred, Tup.Types)(_state);}
     @property Tup.Types[0] front() { return _state.field[0];}
     @property Unfold2 save() { return this;}
-    void popFront() { _state = infun(_state.field[1..$]);}
+    void popFront() { _state = naryFun!fun(_state.field[1..$]);}
 }
 
 /// ditto
@@ -2043,8 +2049,8 @@ Unfold2!(fun, pred, T) unfold2(alias fun, alias pred, T...)(T initialParameters)
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
 //    Tuple!(int, int, int) fibonacci(int a, int b) { return tuple(a, b, a+b);}
     auto fibs = unfold2!("tuple(a,b,a+b)", "a > 100")(0,1); // stops when the generated value is > 100
@@ -2080,7 +2086,7 @@ unittest
 
     // Continued fraction
     Tuple!(real, real) toCF(real d) { return tuple(floor(d), 1.0 / (d - floor(d)));}
-    auto cf = unfold2!(toCF, "isnan(a) || a > 1E+6")(3.245); // Continued fraction dvt for pi 3.1415926...
+    auto cf = unfold2!(toCF, "std.math.isNaN(a) || a > 1E+6")(3.245); // Continued fraction dvt for pi 3.1415926...
     assert(equal(cf, [3,4,12,3,1][]));
 }
 
@@ -2127,8 +2133,8 @@ template CompType(alias gen, alias pred, R...) {
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     Tuple!(int, int, int) foo(int a, int b, int c) { return tuple(a,b,c);}
     int foo2(int a, int b, int c) { return a+b+c;}
@@ -2165,8 +2171,8 @@ template IntersectionType(R...) {
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,2,3];
     auto r2 = [2.0,4,5,3,7,1,0];
@@ -2220,8 +2226,8 @@ Without!(typeof(chain(R.init)), IntersectionType!R) symmetricDifference(R...)(R 
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,7];
     auto r2 = [1,2,5,6,0];
@@ -2284,8 +2290,8 @@ template PCompType(alias gen, alias pred, R...) {
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = numbers(1,100);
     string sentence = "The quick brown fox jumped over the lazy dog.";
@@ -2326,8 +2332,8 @@ AsSet!(CompType!(gen,pred,R)) setComp(alias gen, alias pred, R...)(R inputs) {
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto input = numbers(1,5);
     auto sc = setComp!("a+b+c", "a + b > c")(input, input, input);
@@ -2400,8 +2406,8 @@ Merge!(pred, R) merge(alias pred = "a<b", R...)(R ranges) if (allSatisfy!(isForw
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,2,3];
     auto r2 = [1,4,5];
@@ -2515,8 +2521,8 @@ PCompType!("b","a",bool[], R) select(R)(bool[] flags, R range) if (isForwardRang
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,1,2,3];
     auto s01 = select([false, true][], r);
@@ -2583,8 +2589,8 @@ template SubRanges(R) if (isForwardRange!R)
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,1,2];
     auto sr = subranges(r);
@@ -2684,8 +2690,8 @@ ElementType!R[] sortAsArray(alias pred = "a < b", R)(R range) if (isForwardRange
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [5,1,2,3,4];
     auto r2 = [4.0,3.0,2.0,1.0,0.0];
@@ -2766,8 +2772,8 @@ Group!(R) group(R)(R range) {
 }
 
 unittest {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto test = [0,1,1,2,2,2,3,3,3,3,4,4,4,5,5,6];
     auto g = group(test);
@@ -2850,8 +2856,8 @@ bool contains(R1, E)(R1 range1, E element) if (isInputRange!R1 && !isInputRange!
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     assert("foobarbaz".contains("bar")); // true
     assert("foobarbaz".contains("b"));   // true
@@ -3164,8 +3170,8 @@ template IndicesType(alias value, R) {
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,2,2];
     auto i1 = indices!2(r1);
@@ -3212,8 +3218,8 @@ PCompType!("a","b", Numbers, typeof(map!pred(R.init))) positions(alias pred, R)(
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4,5,6,1];
     auto p1 = positions!"a%2==0"(r1);
@@ -3258,8 +3264,8 @@ TMapType!(atIndex!(R, ElementType!I), Combinations!(Once!R, I)) fromIndex(I, R)(
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto s = cast(immutable(dchar)[])"abcdefg";
 
@@ -3325,8 +3331,8 @@ ToIndex!R toIndex(R)(R range) if (isForwardRange!R)
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto s = cast(immutable(dchar)[])"abcdefabcdefghab";
     auto ti = toIndex(s);
@@ -3362,8 +3368,8 @@ Tuple!(typeof(filter!pred(R.init)), typeof(filter!(Not!pred)(R.init))) separate(
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,1,2,3,4,5];
     auto s = separate!"a<1 || a>3"(r);
@@ -3390,8 +3396,8 @@ Tuple!(typeof(takeWhile!pred(R.init)), R) span(alias pred, R)(R range)
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = map!"a*a"([0,1,2,3,4,5,4,3,2][]);
     auto s = span!"a<10"(r);
@@ -3423,8 +3429,8 @@ ElementType!R[] squeeze(E, R)(E element, R range) if (isForwardRange!R)
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,2,3,4,5,2,2,2,3,5,6,8,3,2];
     string r2 = "abcd  ef g h    ";
@@ -3522,8 +3528,8 @@ Combinations!(R) combinations(R...)(R ranges) if (R.length && allSatisfy!(isForw
 }
 
 unittest {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2]; // Random-access range
     auto r2 = ["a","b","c","d"];
@@ -3746,8 +3752,8 @@ Permutations!(ElementType!R[]) permutations(R)(R r, size_t n) if (!isDynamicArra
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,1,2]; // array
     auto m = map!"a*a"(r); // not an array...
@@ -3909,8 +3915,8 @@ template ChooseType(uint repetition, R) if (isForwardRange!R && !isInfinite!R)
 
 unittest
 {
-    scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("Unittest Failure :%s(%s) ", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     // A poker hand is five cards without repetition among 52 cards.
     // That makes 2,598,960 possible hands.

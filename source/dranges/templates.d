@@ -15,7 +15,7 @@ module dranges.templates;
 
 import std.conv,
        std.functional,
-       std.metastrings,
+       //std.metastrings,
        std.traits,
        std.typecons,
        std.typetuple;
@@ -90,8 +90,8 @@ version( unittest ) {
 }
 
 unittest {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     assert( staticSwitch!( foo, 1, 2 ).With( 2,3 ) == 6 );
 }
@@ -240,8 +240,8 @@ version(unittest)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto c = cycle([1,2,3][]);
     assert(is(typeof(c) == Cycle!(int[]))); // A cycle around an array of int
@@ -430,8 +430,8 @@ auto wrapCode(alias code, size_t n = 1, T)(T value) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int[] appendZero(int[] a) { return a ~ [0];}
     int[] r = [1,2,3];
@@ -442,7 +442,7 @@ unittest
 string[3] between(char b, char e, string s)()
 {
     int foundb;
-    int ib;
+    size_t ib;
     string notFound = "";
     foreach(i,c; s)
     {
@@ -451,7 +451,7 @@ string[3] between(char b, char e, string s)()
             if (foundb == 0)
             {
                 foundb = 1;
-                ib = i+1;
+                ib = i + 1;
                 continue;
             }
             else
@@ -894,8 +894,8 @@ template TransferParamsFrom(alias templ)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     alias TransferParamsTo!Repeat MkRepeat;
     alias MkRepeat.From!(Cycle!(int[])) R; // takes a Cycle!(Range), extracts Range, makes a Repeat from it.
@@ -947,8 +947,8 @@ template SwitchOnType(alias value, Type : Default, alias Action) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int i; double d; string s;
     alias SwitchOnType!(i, int, "It's an int", double, "It's a double", Default, "It's something else") switchi;
@@ -984,8 +984,8 @@ template InlineTemplate(string args, string code, string file, size_t line)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
     
     alias InlineTemplate!("T", q{T value;}, __FILE__, __LINE__) S;
     alias InlineTemplate!("T", q{struct IT{T value;}}, __FILE__, __LINE__) Struct;

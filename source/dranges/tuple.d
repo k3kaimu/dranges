@@ -21,7 +21,7 @@ import std.algorithm,
        std.conv,
        std.exception,
        std.functional,
-       std.metastrings,
+       //std.metastrings,
        std.range,
        std.stdio,
        std.traits,
@@ -91,8 +91,8 @@ CommonType!R[] tupleToDynamicArray(R...)(Tuple!(R) t) if (!is(CommonType!R == vo
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t = tuple(1, 2.0, 10000000000);
     auto sa = tupleToStaticArray(t);
@@ -140,8 +140,8 @@ Tuple!(TypeNuple!(T,n)) dynamicArrayToTuple(size_t n, T)(T[] arr) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int[3] a = [1,2,3];
     auto t1 = staticArrayToTuple(a);
@@ -177,8 +177,8 @@ Tuple!(TypeNuple!(ElementType!R,upTo)) rangeToTuple(size_t upTo, R)(R range) if 
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r = [0,1,2,3,4,5];
     auto f = filter!isOdd(r);
@@ -227,8 +227,8 @@ bool empty(R...)(Tuple!R tup)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t = tuple('a',1, 3.1415);
     assert(front(t)  == 'a');
@@ -264,8 +264,8 @@ Tuple!(TypeTuple!(R[0..n],T,R[n..$])) insertAtTuple(size_t n, T, R...)(Tuple!R t
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t = tuple(1,'a',3.14);
     auto s0 = insertAtTuple!0(t, "qwer");
@@ -311,8 +311,8 @@ template ShredType(alias array, R...) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t = tuple(1, 'a', 3.14);
 
@@ -361,8 +361,8 @@ Tuple!(RotateTypes!(n,R)) rotateTuple(int n, R...)(Tuple!R tup)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t = tuple(1, 'a', 3.14);
 
@@ -399,8 +399,8 @@ Tuple!(ReverseTypes!R) reverseTuple(R...)(Tuple!R tup)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t = tuple(1,'a',3.14);
     auto r = reverseTuple(t);
@@ -427,8 +427,8 @@ Tuple!(T1.Types, T2.Types) stitchTuples(T1, T2)(T1 tup1, T2 tup2) if (is(T1.Type
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t1 = tuple(1, 'a', 3.14);
     auto t2 = tuple("abc", true);
@@ -454,8 +454,8 @@ Tuple!(R, E) append(E, R...)(Tuple!R tup, E element)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t = tuple(1, 'a', 3.14);
     auto t2 = append(t, "abc");
@@ -480,8 +480,8 @@ Tuple!(E, R) prepend(E, R...)(E element, Tuple!R tup)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t = tuple(1, 'a', 3.14);
     auto t2 = prepend("abc", t);
@@ -523,8 +523,8 @@ Tuple!(SwapTypes!(i1,i2,R)) swapTuple(size_t i1, size_t i2, R...)(Tuple!R tup)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto t = tuple(1, 'a', 3.14, "abc");
     auto ts1 = swapTuple!(1,3)(t);
@@ -569,8 +569,8 @@ Tuple!(FlattenTuple!T) flattenTuple(T...)(T tup)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
     
     auto t0 = tuple(0);
     auto t1 = tuple("a", 3.14);

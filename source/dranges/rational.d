@@ -255,7 +255,7 @@ struct Rational(T)if(isLikeBuiltInInt!T){
 
 
     void reduce() pure nothrow @safe {
-        debug "reduce:\n Input: _num : %s, _den : %s".writefln(_num, _den);
+        //debug "reduce:\n Input: _num : %s, _den : %s".writefln(_num, _den);
         if(_num == 0){
             if(_den < 0)
                 _den = -1;
@@ -265,14 +265,14 @@ struct Rational(T)if(isLikeBuiltInInt!T){
             auto _gcd = gcd(_num, _den);
             _num /= _gcd;
             _den /= _gcd;
-            debug "......: _num : %s, _den : %s".writefln(_num, _den);
+            //debug "......: _num : %s, _den : %s".writefln(_num, _den);
         }
 
         if(_den < 0){
             _num = -_num;
             _den = -_den;
         }
-        debug "Output: _num : %s, _den : %s".writefln(_num, _den);
+        //debug "Output: _num : %s, _den : %s".writefln(_num, _den);
     }
 
     
@@ -302,7 +302,7 @@ struct Rational(T)if(isLikeBuiltInInt!T){
     this(U, V)(U n, V d, bool nonReduce = false) pure nothrow @safe if(isAssignable!(T, U) && isAssignable!(T, V)) {
         _num = n;
         _den = d;
-        debug writefln("%s / %s", _num, _den);
+        //debug writefln("%s / %s", _num, _den);
         if(!nonReduce) reduce();
     }
 
@@ -604,7 +604,7 @@ private:
 
 
     void reduce() {
-        debug "reduce:\n Input: _num : %s, _den : %s".writefln(_num, _den);
+        //debug "reduce:\n Input: _num : %s, _den : %s".writefln(_num, _den);
         if(_num == 0){
             if(_den < 0)
                 _den = -1;
@@ -614,14 +614,14 @@ private:
             auto _gcd = gcd(_num, _den);
             _num /= _gcd;
             _den /= _gcd;
-            debug "......: _num : %s, _den : %s".writefln(_num, _den);
+            //debug "......: _num : %s, _den : %s".writefln(_num, _den);
         }
 
         if(_den < 0){
             _num = -_num;
             _den = -_den;
         }
-        debug "Output: _num : %s, _den : %s".writefln(_num, _den);
+        //debug "Output: _num : %s, _den : %s".writefln(_num, _den);
     }
 
     
@@ -651,7 +651,7 @@ public:
     this(U, V)(U n, V d, bool nonReduce = false) if(isAssignable!(T, U) && isAssignable!(T, V)) {
         _num = n;
         _den = d;
-        debug writefln("%s / %s", _num, _den);
+        //debug writefln("%s / %s", _num, _den);
         if(!nonReduce) reduce();
     }
 
@@ -1278,7 +1278,7 @@ unittest{   //BigInt test
     assert(r1 == 729);
     assert(r1 == BigInt(729));
     assert(r1 <= BigInt(729));
-    assert(r1 !< r(729));
+    assert(r1 >= r(729));
     assert(r1 < r(700*8, 3));
     assert(r1 > r(700*2, 3));
 

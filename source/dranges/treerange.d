@@ -153,8 +153,8 @@ I opTree(string op, I, T)(I ifNull, Tree!T tr) { return reduceTree!(format("a %s
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
     
     auto t0 = tree(0);
     auto t1 = tree(1, t0, tree(2));

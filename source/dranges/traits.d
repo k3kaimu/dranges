@@ -15,7 +15,7 @@ module dranges.traits;
 import std.conv,
        std.exception,
        std.functional,
-       std.metastrings,
+       //std.metastrings,
        std.range,
        std.stdio,
        std.traits,
@@ -47,8 +47,8 @@ template isFunction(F)
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int a;
     int foo() { return 0;}
@@ -80,8 +80,8 @@ template ElementTypes(R, Rest...) {
 }
 
 unittest {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1];
     auto r2 = [2.0, 3.1];
@@ -100,8 +100,8 @@ template CommonElementType(R...) if (allSatisfy!(isInputRange, R)) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     auto r2 = [0.0,1.0,2.0];
@@ -121,8 +121,8 @@ template CompatibleRanges(R...) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     auto r1 = [0,1,2,3,4];
     auto r2 = [0.0,1.0,2.0];
@@ -207,8 +207,8 @@ template hasLength2(R) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     assert(hasLength!(int[]));
     assert(hasLength!(int[3]));
@@ -248,8 +248,8 @@ template rank(R) if (!isForwardRange!R)
 }
 
 unittest {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int[] r1 = [0,1,2,3][];
     int[][] r2 = [r1, [4][], r1];
@@ -274,8 +274,8 @@ template BaseElementType(R) if(isRangeOfRanges!(R)) {
 }
 
 unittest {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int[][] arr = [[0,1][], [2,3][]];
     auto arr2 = [arr, [[4][]][], arr][];
@@ -312,8 +312,8 @@ template BaseElementTypeUpTo(R, int maxDepth = int.max) if(isRangeOfRanges!(R)) 
 }
 
 unittest {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     int[][][][] array4;
     assert(is(BaseElementTypeUpTo!(typeof(array4), 0) == int[][][][]));
@@ -338,8 +338,8 @@ template someSatisfy(alias pred, R...) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     static assert(someSatisfy!(isIntegral, int, double));
     static assert(someSatisfy!(isIntegral, int, long));
@@ -397,8 +397,8 @@ template Signed(T) {
 
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
 
     alias TypeTuple!(int, uint, ulong, double, ushort) Test;
     assert(is(staticMap!(Signed, Test) == TypeTuple!(int,int,long,double,short)));
@@ -432,8 +432,8 @@ template checkFunctionAttribute(int type, string code, T...){
 }
 
 unittest{
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
     
     static assert(checkFunctionAttribute!(FunctionAttribute.pure_ | FunctionAttribute.nothrow_ | FunctionAttribute.safe,
                     "a+a", int));

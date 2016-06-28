@@ -14,14 +14,14 @@ Distributed under the Boost Software License, Version 1.0.
 */
 module dranges._phobos_extension;
 
-import std.c.string; // to give the templates access to c.string as template parameters
+import core.stdc.string; // to give the templates access to c.string as template parameters
 import std.algorithm,
        std.array,
        std.conv,
        std.exception,
        std.functional,
        std.math,
-       std.metastrings,
+       //std.metastrings,
        std.range,
        std.stdio,
        std.string,

@@ -57,8 +57,8 @@ if(isAssociativeArray!(AA))
 ///
 unittest
 {
-    scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
-    scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
+    debug scope(failure) writefln("unittest Failure :%s(%s)", __FILE__, __LINE__);
+    debug scope(success) {writefln("Unittest Success :%s(%s)", __FILE__, __LINE__); stdout.flush();}
     
     auto aa = ["Hello":5, "World!":6, "a":99, "":0, "Howdy":6];
     auto aa_range = aa.asRange;
